@@ -1,0 +1,20 @@
+/node_modules/
+/coverage
+/migrations/.migrate
+npm-debug.log
+*.ipr
+*.iws
+*.iml
+.idea
+
+# new relic log
+newrelic_agent.log
+
+# Ignore Mac DS_Store files
+.DS_Store
+
+# ts generated
+ds.consumer.routes/**/*.js
+ds.consumer.routes/**/*.js.map
+ds.consumer.routes/**/*.d.ts
+!ds.consumer.routes/shorturl-2.d.ts

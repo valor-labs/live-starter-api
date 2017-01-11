@@ -1,0 +1,48 @@
+{
+  "name": "live-starter-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./app.js",
+    "watch": "./node_modules/.bin/tsc -w ./ds.consumer.routes/**/*.ts ./ds.consumer.routes/*.ts",
+    "build:dev": "./node_modules/.bin/tsc",
+    "flow.eslint": "./node_modules/.bin/eslint --ignore-path .gitignore --ext js --fix . .config",
+    "flow.tslint": "./node_modules/.bin/tslint ./ds.consumer.routes/**/*.ts -c tslint.json",
+    "flow.lint": "npm run flow.eslint && npm run flow.tslint"
+  },
+  "pre-commit": [
+    "flow.lint"
+  ],
+  "dependencies": {
+    "body-parser": "1.15.2",
+    "cors": "2.8.1",
+    "eslint-config-valorsoft": "0.1.0",
+    "express": "4.14.0",
+    "express-redis-cache": "0.5.0",
+    "lodash": "4.17.4",
+    "mime": "1.3.4",
+    "mongoose": "4.7.6",
+    "morgan": "1.7.0",
+    "nconf": "0.8.4",
+    "rxjs": "5.0.2"
+  },
+  "devDependencies": {
+    "@angular/compiler": "2.4.1",
+    "@angular/core": "2.4.1",
+    "@types/async": "2.0.37",
+    "@types/core-js": "0.9.35",
+    "@types/express": "4.0.34",
+    "@types/lodash": "4.14.45",
+    "@types/mime": "0.0.29",
+    "@types/mongoose": "4.7.2",
+    "@types/node": "6.0.57",
+    "@types/promise": "7.1.30",
+    "async": "2.1.4",
+    "gitignore-to-glob": "0.3.0",
+    "pre-commit": "1.2.2",
+    "tslint": "4.3.0",
+    "tslint-config-valorsoft": "1.2.0",
+    "typescript": "2.0.10",
+    "zone.js": "0.7.4"
+  }
+}
