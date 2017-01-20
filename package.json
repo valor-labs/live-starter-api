@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "start": "node ./app.js",
-    "watch": "./node_modules/.bin/tsc -w ./ds.consumer.routes/**/*.ts ./ds.consumer.routes/*.ts",
+    "watch": "./node_modules/.bin/tsc -w ./routes/**/*.ts ./routes/*.ts",
     "build:dev": "./node_modules/.bin/tsc",
     "flow.eslint": "./node_modules/.bin/eslint --ignore-path .gitignore --ext js --fix . .config",
-    "flow.tslint": "./node_modules/.bin/tslint ./ds.consumer.routes/**/*.ts -c tslint.json",
+    "flow.tslint": "./node_modules/.bin/tslint ./routes/**/*.ts -c tslint.json",
     "flow.lint": "npm run flow.eslint && npm run flow.tslint"
   },
   "pre-commit": [
