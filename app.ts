@@ -1,4 +1,6 @@
-'use strict';
+import {Config} from './config';
+import './models';
+import {Routes} from './routes';
 
 // const mongoose = require('mongoose');
 const express = require('express');
@@ -7,9 +9,8 @@ const app = express();
 
 // mongoose.Promise = Promise;
 
-require('./config')(app);
-require('./models')(app);
-require('./routes')(app);
+new Config(app);
+new Routes(app);
 
 const nconf = app.get('nconf');
 

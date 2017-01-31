@@ -5,8 +5,10 @@ import { Schema } from 'mongoose';
  @typedef {Object} Users
  @property {String} genres - genres of a music
  */
-const genresSchema = new Schema({
-  genres: String
+const faqsSchema = new Schema({
+  poistion: Number,
+  question: String,
+  answer: String
 });
 
-export default mongoose.model('Genres', genresSchema);
+export default mongoose.model('Faqs', faqsSchema);

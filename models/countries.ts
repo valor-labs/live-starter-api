@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 
 /**
  @typedef {Object} Users
@@ -13,4 +13,4 @@ const countriesSchema = new Schema({
   alias: String
 });
 
-mongoose.model('Countries', countriesSchema);
+export default mongoose.model('Countries', countriesSchema);

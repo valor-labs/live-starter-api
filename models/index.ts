@@ -1,6 +1,6 @@
-module.exports = () => {
-  require('./users');
-  require('./genres');
-  require('./countries');
-  require('./cities');
-};
+import './cities';
+import './users';
+import './countries';
+import './faqs';
+import './genres';
+import './events';

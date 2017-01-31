@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 
 /**
  @typedef {Object} Users
@@ -32,42 +32,43 @@ const Schema = mongoose.Schema;
  */
 const usersSchema = new Schema({
   active: Boolean,
-	avatar: String,
-	username: {type: String, unique: true},
-	password: String,
-	firstName: String,
-	lastName: String,
-	gender: String,
+  avatar: String,
+  username: {type: String, unique: true},
+  password: String,
+  firstName: String,
+  lastName: String,
+  gender: String,
   email: {type: String, unique: true},
-	role: {type: String, default: 'user'},
-	type: String,
-	city: String,
-	country: String,
-	// location: {type: Schema.Types.ObjectId, ref: 'Locations'},
-	viewers: {type: Schema.Types.ObjectId, ref: 'Users'},
-	appreciations: {type: Schema.Types.ObjectId, ref: 'Users'},
-	followers: {type: Schema.Types.ObjectId, ref: 'Users'},
-	followings: {type: Schema.Types.ObjectId, ref: 'Users'},
-	website: String,
-	joinDate: String,
-	biography: String,
-	contacts: {
-  	phone: String,
-		skype: String,
-		hangouts: String},
-	shows: {type: Schema.Types.ObjectId, ref: 'Events'},
-	socials: {
-  	google: String,
-		facebook: String,
-		twitter: String},
-	comments: {type: Schema.Types.ObjectId, ref: 'Comments'},
-	reviews: {type: Schema.Types.ObjectId, ref: 'Reviews'},
-	video: {type: Schema.Types.ObjectId, ref: 'Media'},
-	audio: {type: Schema.Types.ObjectId, ref: 'Media'},
-	photo: {type: Schema.Types.ObjectId, ref: 'Media'},
-	// genres: {type: Schema.Types.ObjectId, ref: 'Genres'},
-	genres: String,
-	groupName: String
+  role: {type: String, default: 'user'},
+  type: String,
+  position: String,
+  city: String,
+  country: String,
+  viewers: [],
+  appreciations: [],
+  followers: [],
+  followings: [],
+  website: String,
+  joinDate: String,
+  biography: String,
+  contacts: {
+    phone: String,
+    skype: String,
+    hangouts: String
+  },
+  shows: [],
+  socials: {
+    google: String,
+    facebook: String,
+    twitter: String
+  },
+  comments: [],
+  reviews: [],
+  video: [],
+  audio: [],
+  photo: [],
+  genres: String,
+  groupName: String
 });
 
-mongoose.model('Users', usersSchema);
+export default mongoose.model('Users', usersSchema);
