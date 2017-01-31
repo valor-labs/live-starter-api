@@ -19,7 +19,6 @@ function signUpUser(req, res) {
     return res.json({ success: true, data: 'user saved', error: null });
 }
 function getLocations(req, res) {
-    // return (req: any, res: any): Promise<any> | any => {
     async.parallel({
         getCountries: getCountries,
         getCities: getCities
@@ -28,10 +27,8 @@ function getLocations(req, res) {
             console.log('error');
             return res.json({ success: !err, msg: [], data: results, error: err });
         }
-        console.log('dfsdfsfsdfsdf');
         return res.json({ success: !err, msg: [], data: results, error: err });
     });
-    // }
 }
 function isEmailExist(req, res) {
     const query = req.body;

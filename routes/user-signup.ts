@@ -24,9 +24,6 @@ function signUpUser(req, res) {
 }
 
 function getLocations(req, res): any {
-
-
-	// return (req: any, res: any): Promise<any> | any => {
 		async.parallel({
 			getCountries: getCountries,
 			getCities: getCities
@@ -35,10 +32,9 @@ function getLocations(req, res): any {
 				console.log('error');
 				return res.json({success: !err, msg: [], data: results, error: err});
 			}
-			console.log('dfsdfsfsdfsdf');
 			return res.json({success: !err, msg: [], data: results, error: err});
 		});
-	// }
+
 }
 
 function isEmailExist(req, res) {
