@@ -1,16 +1,31 @@
 'use strict';
+const mongoose = require('mongoose');
+const Users = mongoose.model('Users');
 module.exports = (app) => {
     app.post('/login', loginUser);
 };
 function loginUser(req, res) {
     const query = req.body;
-    console.log('query: ', query);
-    if (query.email === 'robert.shaw@gmail.com' && query.pwd === '123') {
-        let response = { data: { name: 'Robert', lastName: 'Shaw', type: 'musician', error: null } };
-        res.json(response);
-        return;
+    if (!query.email || !query.pwd) {
+        return res.json({ data: null, error: 'Data invalid. Please check required fields.' });
     }
     else {
-        res.json({ data: { error: 'Email or password invalid.' } });
+        Users
+            .findOne({ email: query.email })
+            .lean()
+            .exec((dbError, data) => {
+            const userCreateError = 'No such user. Please sign up.';
+            const userPwdError = 'Invalid password.';
+            if (dbError) {
+                return res.json({ success: !dbError, data: null, error: dbError });
+            }
+            if (!data || data.length === 0) {
+                return res.json({ success: !dbError, data: null, error: userCreateError });
+            }
+            if (query.pwd !== data.password) {
+                return res.json({ success: !dbError, data: null, error: userPwdError });
+            }
+            return res.json({ success: !dbError, data: data, error: dbError });
+        });
     }
 }

@@ -8,7 +8,7 @@ const app = express();
 // mongoose.Promise = Promise;
 
 require('./config')(app);
-// require('./ds.models')();
+require('./models')(app);
 require('./routes')(app);
 
 const nconf = app.get('nconf');
