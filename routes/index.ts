@@ -1,7 +1,10 @@
-'use strict';
+import { Express }  from 'express';
 
-module.exports = (app) => {
-  require('./music-styles')(app);
-  require('./user-login')(app);
-  require('./user-signup')(app);
-};
+export class Routes {
+  public constructor(app: Express) {
+    require('./search-filters')(app);
+    require('./user-signup')(app);
+    require('./faq')(app);
+    require('./event')(app);
+  }
+}

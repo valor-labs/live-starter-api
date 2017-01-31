@@ -1,11 +1,20 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 
 /**
  @typedef {Object} Users
  @property {String} genres - genres of a music
  */
-const citiesSchema = new Schema({
+
+export interface ICity extends mongoose.Document {
+  city: string;
+  country: string;
+  lat: number;
+  lng: number;
+  alias: number;
+}
+
+export const citiesSchema = new Schema({
   city: String,
   country: {type: Schema.Types.ObjectId, ref: 'Countries'},
   lat: Number,
@@ -13,4 +22,4 @@ const citiesSchema = new Schema({
   alias: String
 });
 
-mongoose.model('Cities', citiesSchema);
+export default mongoose.model('Cities', citiesSchema);

@@ -1,7 +1,12 @@
-'use strict';
+import { Express }  from 'express';
+import { AppConfig } from './app.config';
+import { ExpressConfig } from './express.config';
+import { DbConfig } from './db.config';
 
-module.exports = (app) => {
-  require('./config')(app);
-  require('./express.config')(app);
-  require('./db.config')(app);
-};
+export class Config {
+  public constructor(app: Express) {
+    new AppConfig(app);
+    new ExpressConfig(app);
+    new DbConfig(app);
+  }
+}
