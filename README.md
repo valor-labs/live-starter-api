@@ -1,4 +1,4 @@
-# DS Consumer Api
+# LiveStarter Api
 
 # How to install
 - `git clone`
@@ -9,3 +9,4 @@
 # API
 - `/music-styles`: `getMusicStyles` // Gets music styles for search filter
 - `/login`: `loginUser` // Makes user log in (email, pwd)
+- `/signup`: `signupUser` // Makes user sign up (email, pwd)
