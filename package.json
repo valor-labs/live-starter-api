@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npm run tsc && ts-node app.ts",
-    "tsc": "tsc --project tsconfig.json",
+    "start": "npm run tsc && ./node_modules/.bin/ts-node app.ts",
+    "tsc": "./node_modules/.bin/tsc --project tsconfig.json",
     "watch": "./node_modules/.bin/tsc -w ./routes/**/*.ts ./routes/*.ts",
     "build:dev": "./node_modules/.bin/tsc",
     "flow.tslint": "./node_modules/.bin/tslint ./routes/**/*.ts -c tslint.json",
@@ -35,7 +35,8 @@
     "morgan": "1.8.1",
     "nconf": "0.8.4",
     "rxjs": "5.2.0",
-    "ts-node": "2.1.0"
+    "ts-node": "2.1.0",
+		"typescript": "2.2.1"
   },
   "devDependencies": {
     "codelyzer": "3.0.0-beta.3",
