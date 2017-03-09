@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npm run tsc && ts-node app.ts",
+    "start": "npm i && npm run tsc && ts-node app.ts",
     "tsc": "./node_modules/.bin/tsc --project tsconfig.json",
     "watch": "./node_modules/.bin/tsc -w ./routes/**/*.ts ./routes/*.ts",
     "build:dev": "./node_modules/.bin/tsc",
