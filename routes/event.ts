@@ -4,9 +4,9 @@ import * as mongoose from 'mongoose';
 const Events: any = mongoose.model('Events');
 
 module.exports = (app: Express): void => {
-  app.get('/getNonLiveEventsAmount', getNonLiveEventsAmountData);
-  app.get('/getEventsListByQuery', getEventsDatabyQuery);
-  app.post('/saveEvent', saveNewEvent);
+  app.get('/get-non-live-events-amount', getNonLiveEventsAmountData);
+  app.get('/get-events-list-by-query', getEventsDataByQuery);
+  app.post('/save-event', saveNewEvent);
 };
 
 function getNonLiveEventsAmountData(req: Request, res: any): Promise<any> {
@@ -20,9 +20,23 @@ function getNonLiveEventsAmountData(req: Request, res: any): Promise<any> {
     );
 }
 
-function getEventsDatabyQuery(req: Request, res: any): Promise<any> {
+function getEventsDataByQuery(req: Request, res: any): Promise<any> {
   const query = req.query;
-  const commonQuery: any = {datePerformance: query.findByDate};
+  const commonQuery: any = {};
+
+  if (query.exceptByName && query.exceptByCreator) {
+    commonQuery.showName = {$ne: query.exceptByName};
+    commonQuery.creator = {$ne: query.exceptByName};
+  }
+
+  if (query.findByCreator && query.findByName) {
+    commonQuery.showName = query.findByName;
+    commonQuery.creator = query.findByCreator;
+  }
+
+  if (query.findByDate) {
+    commonQuery.datePerformance = query.findByDate;
+  }
 
   if (query.findByGenre) {
     commonQuery.genre = {$in: [query.findByGenre]};

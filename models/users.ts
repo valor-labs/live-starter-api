@@ -33,8 +33,7 @@ import { Schema } from 'mongoose';
 const usersSchema = new Schema({
   active: Boolean,
   avatar: String,
-  username: {type: String, unique: true},
-  password: String,
+  username: String,
   firstName: String,
   lastName: String,
   gender: String,
@@ -67,7 +66,7 @@ const usersSchema = new Schema({
   video: [],
   audio: [],
   photo: [],
-  genres: String,
+  genres: [],
   groupName: String
 });
 
