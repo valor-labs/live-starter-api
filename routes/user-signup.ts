@@ -12,18 +12,16 @@ module.exports = (app: Express): void => {
   app.post('/signup', signUpUser);
   app.post('/signup/check-email', isEmailExist);
   app.post('/edit-profile/edit-user-data', editUser);
+  app.post('/edit-profile/edit-user-avatar', editUserAvatar);
 };
 
 interface GetUserDataInterface {
   email: string;
 }
 
-interface EditUserDataInterface {
+interface EditUserAvatarInterface {
   email: string;
-  firstName: string;
-  lastName: string;
-  country: string;
-  city: string;
+  newAvatarLink: string;
 }
 
 function getUserData(req: Request, res: any): Promise<any> | Function {
@@ -42,7 +40,25 @@ function getUserData(req: Request, res: any): Promise<any> | Function {
 }
 
 function editUser(req: Request, res: any): Promise<any> | Function {
-  const body: EditUserDataInterface = req.body;
+  const body: any = req.body;
+  const userUpdateSet = body.userUpdateSet;
+
+  if (!body.email) {
+    return res.json({
+      success: false, data: 'user update failed', error: 'User has no email. ' +
+      'Update without email prohibited.'
+    });
+  }
+
+  return Users
+    .update({email: body.email}, {$set: userUpdateSet})
+    .exec((err: Error): Function => {
+      return res.json({success: !err, data: 'user updated', error: err});
+    });
+}
+
+function editUserAvatar(req: Request, res: any): Promise<any> | Function {
+  const body: EditUserAvatarInterface = req.body;
 
   if (!body.email) {
     return res.json({
@@ -54,10 +70,7 @@ function editUser(req: Request, res: any): Promise<any> | Function {
   return Users
     .update({email: body.email}, {
       $set: {
-        firstName: body.firstName,
-        lastName: body.lastName,
-        country: body.country,
-        city: body.city
+        avatar: body.newAvatarLink
       }
     })
     .exec((err: Error): Function => {
@@ -86,7 +99,6 @@ function getLocations(req: Request, res: any): void {
   }, (err: any, results: {getCountries: any, getCities: any}): Function => {
     return res.json({success: !err, msg: [], data: results, error: err});
   });
-
 }
 
 function isEmailExist(req: Request, res: any): Promise<any> | Function {

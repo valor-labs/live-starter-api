@@ -6,5 +6,6 @@ export class Routes {
     require('./user-signup')(app);
     require('./faq')(app);
     require('./event')(app);
+    require('./appriciations')(app);
   }
 }
