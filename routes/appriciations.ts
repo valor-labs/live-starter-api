@@ -1,9 +1,12 @@
-import { Request, Express }  from 'express';
+/* tslint:disable:no-any */
+/* tslint:disable:import-blacklist */
+
+import { Request, Express } from 'express';
 import * as mongoose from 'mongoose';
 import { find, head, findIndex } from 'lodash';
 
-const Users: any = mongoose.model('Users');
-const Events: any = mongoose.model('Events');
+const users = mongoose.model('Users');
+const events = mongoose.model('Events');
 
 module.exports = (app: Express): void => {
   app.post('/appreciate-artist', appreciateArtist);
@@ -22,13 +25,13 @@ function appreciateArtist(req: Request, res: any): Promise<any> | Function {
     });
   }
 
-  return Users
+  return users
     .find({email: body.artistAppreciate})
     .limit(1)
     .lean(true)
-    .exec((err: Error, data: any): void => {
+    .exec((err: Error, data: any): Promise<any> => {
       if (err) {
-        console.error(err);
+
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
@@ -40,7 +43,7 @@ function appreciateArtist(req: Request, res: any): Promise<any> | Function {
       });
 
       if (apprs.length === 0 || !founded) {
-        return Users
+        return users
           .update({email: body.artistAppreciate}, {
             $push: {
               appreciations: body.email
@@ -51,7 +54,7 @@ function appreciateArtist(req: Request, res: any): Promise<any> | Function {
           });
       }
 
-      return Users
+      return users
         .update({email: body.artistAppreciate}, {
           $pull: {
             appreciations: body.email
@@ -73,13 +76,13 @@ function appreciateEvent(req: Request, res: any): Promise<any> | Function {
     });
   }
 
-  return Events
+  return events
     .find({creator: body.artistAppreciate, datePerformance: body.datePerformance})
     .limit(1)
     .lean(true)
-    .exec((err: Error, data: any): void => {
+    .exec((err: Error, data: any): Promise<any> => {
       if (err) {
-        console.error(err);
+
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
@@ -91,7 +94,7 @@ function appreciateEvent(req: Request, res: any): Promise<any> | Function {
       });
 
       if (apprs.length === 0 || !founded) {
-        return Events
+        return events
           .update({creator: body.artistAppreciate, datePerformance: body.datePerformance}, {
             $push: {
               appreciations: body.email
@@ -102,7 +105,7 @@ function appreciateEvent(req: Request, res: any): Promise<any> | Function {
           });
       }
 
-      return Events
+      return events
         .update({creator: body.artistAppreciate, datePerformance: body.datePerformance}, {
           $pull: {
             appreciations: body.email
@@ -123,16 +126,17 @@ function appreciateSong(req: Request, res: any): Promise<any> | Function {
       'Update without email prohibited.'
     });
   }
-  return Events
+
+  return events
     .find({
       creator: body.artistAppreciate,
       datePerformance: body.datePerformance
     })
     .limit(1)
     .lean(true)
-    .exec((err: Error, data: any[]): void => {
+    .exec((err: Error, data: any[]): Promise<any> => {
       if (err) {
-        console.error(err);
+
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
@@ -146,7 +150,7 @@ function appreciateSong(req: Request, res: any): Promise<any> | Function {
       const field = `audio.${getSongIndex}.appreciations`;
 
       if (apprs.length === 0 || !founded) {
-        return Events
+        return events
           .update({
             creator: body.artistAppreciate, datePerformance: body.datePerformance
           }, {
@@ -158,7 +162,8 @@ function appreciateSong(req: Request, res: any): Promise<any> | Function {
             return res.json({success: !error, data: 'song updated', error});
           });
       }
-      return Events
+
+      return events
         .update({creator: body.artistAppreciate, datePerformance: body.datePerformance}, {
           $pull: {
             [field]: body.email
@@ -179,16 +184,17 @@ function appreciateVideo(req: Request, res: any): Promise<any> | Function {
       'Update without email prohibited.'
     });
   }
-  return Events
+
+  return events
     .find({
       creator: body.artistAppreciate,
       datePerformance: body.datePerformance
     })
     .limit(1)
     .lean(true)
-    .exec((err: Error, data: any[]): void => {
+    .exec((err: Error, data: any[]): Promise<any> => {
       if (err) {
-        console.error(err);
+
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
@@ -202,7 +208,7 @@ function appreciateVideo(req: Request, res: any): Promise<any> | Function {
       const field = `video.${getVideoIndex}.appreciations`;
 
       if (apprs.length === 0 || !founded) {
-        return Events
+        return events
           .update({
             creator: body.artistAppreciate, datePerformance: body.datePerformance
           }, {
@@ -214,7 +220,8 @@ function appreciateVideo(req: Request, res: any): Promise<any> | Function {
             return res.json({success: !error, data: 'video updated', error});
           });
       }
-      return Events
+
+      return events
         .update({creator: body.artistAppreciate, datePerformance: body.datePerformance}, {
           $pull: {
             [field]: body.email

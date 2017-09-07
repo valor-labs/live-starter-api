@@ -1,10 +1,12 @@
+/* tslint:disable:no-any */
+
 import * as async from 'async';
 import * as mongoose from 'mongoose';
-import { Request, Express }  from 'express';
+import { Request, Express } from 'express';
 
-const Users: any = mongoose.model('Users');
-const Countries: any = mongoose.model('Countries');
-const Cities: any = mongoose.model('Cities');
+const users: any = mongoose.model('Users');
+const countries: any = mongoose.model('Countries');
+const cities: any = mongoose.model('Cities');
 
 module.exports = (app: Express): void => {
   app.get('/signup/get-locations', getLocations);
@@ -31,7 +33,7 @@ function getUserData(req: Request, res: any): Promise<any> | Function {
     return res.json({success: false, data: 'user data failed', error: 'User has no email.'});
   }
 
-  return Users
+  return users
     .findOne({email: query.email})
     .lean(true)
     .exec((err: Error, user: any): Function => {
@@ -50,7 +52,7 @@ function editUser(req: Request, res: any): Promise<any> | Function {
     });
   }
 
-  return Users
+  return users
     .update({email: body.email}, {$set: userUpdateSet})
     .exec((err: Error): Function => {
       return res.json({success: !err, data: 'user updated', error: err});
@@ -67,7 +69,7 @@ function editUserAvatar(req: Request, res: any): Promise<any> | Function {
     });
   }
 
-  return Users
+  return users
     .update({email: body.email}, {
       $set: {
         avatar: body.newAvatarLink
@@ -85,7 +87,7 @@ function signUpUser(req: Request, res: any): Promise<any> {
     body.username = body.email;
   }
 
-  let newUser = new Users(body);
+  const newUser = new users(body);
 
   return newUser.save((err: Error): Function => {
     return res.json({success: !err, data: 'user saved', error: err});
@@ -108,32 +110,34 @@ function isEmailExist(req: Request, res: any): Promise<any> | Function {
     return res.json({success: false, data: null, error: 'Data invalid. Please check required fields.'});
   }
 
-  return Users
+  return users
     .find({email: body.email})
     .lean(true)
     .exec((dbError: Error, data: any): Function => {
       if (dbError) {
-        console.log(dbError);
+
         return res.json({success: !dbError, data: null, error: dbError});
       }
 
       if (data.length !== 0) {
         const userCreateError = 'This email already used.';
+
         return res.json({success: !dbError, data: null, error: userCreateError});
       }
+
       return res.json({success: !dbError, data, error: dbError});
     });
 }
 
 function getCountries(cb: Function): Promise<any> {
-  return Countries
+  return countries
     .find({})
     .lean(true)
     .exec(cb);
 }
 
 function getCities(cb: Function): Promise<any> {
-  return Cities
+  return cities
     .find({})
     .lean(true)
     .exec(cb);

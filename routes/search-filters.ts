@@ -1,11 +1,14 @@
-import { Request, Express }  from 'express';
+/* tslint:disable:no-any */
+/* tslint:disable:import-blacklist */
+
+import { Request, Express } from 'express';
 import { head } from 'lodash';
 import * as mongoose from 'mongoose';
 
-const Genres: any = mongoose.model('Genres');
-const Countries: any = mongoose.model('Countries');
-const Users: any = mongoose.model('Users');
-const Events: any = mongoose.model('Events');
+const genres: any = mongoose.model('Genres');
+const countries: any = mongoose.model('Countries');
+const users: any = mongoose.model('Users');
+const events: any = mongoose.model('Events');
 
 module.exports = (app: Express): void => {
   app.get('/music-styles', getMusicStyles);
@@ -15,19 +18,19 @@ module.exports = (app: Express): void => {
 };
 
 function getMusicStyles(req: Request, res: any): Promise<any> {
-  return Genres
+  return genres
     .find({}, {genres: 1})
     .limit(1)
     .lean(true)
     .exec((dbError: Error, data: any): Function => {
-      const genres = head(data);
+      const genresCollection = head(data);
 
-      return res.json({success: !dbError, data: genres, error: dbError});
+      return res.json({success: !dbError, data: genresCollection, error: dbError});
     });
 }
 
 function getLocations(req: Request, res: any): Promise<any> {
-  return Countries
+  return countries
     .find({})
     .lean(true)
     .exec((dbError: Error, data: any): Function => {
@@ -51,7 +54,7 @@ function getArtistsList(req: Request, res: any): Promise<any> {
     findArtstsBy.genres = query.findByGenre;
   }
 
-  return Users
+  return users
     .find(findArtstsBy)
     .lean(true)
     .exec((err: Error, data: any): Function => {
@@ -62,10 +65,11 @@ function getArtistsList(req: Request, res: any): Promise<any> {
 
 function getFeaturedArtistsList(req: Request, res: any): Promise<any> {
   const findArtstsBy: any = {active: true};
+  const limitOfFoundUsers = 3;
 
-  return Users
+  return users
     .find(findArtstsBy)
-    .limit(3)
+    .limit(limitOfFoundUsers)
     .lean(true)
     .exec((err: Error, data: any): Function => {
         return res.json({success: !err, data: {artists: data}, error: err});

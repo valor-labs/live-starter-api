@@ -1,3 +1,5 @@
+/* tslint:disable:no-any */
+
 import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose';
 
@@ -6,7 +8,7 @@ import { Schema } from 'mongoose';
  @property {String} genre - genres of a music
  */
 
-export interface IEvent extends mongoose.Document {
+export interface Event extends mongoose.Document {
   showName: string;
   tickets: number;
   fundedPercentage: number;

@@ -1,7 +1,9 @@
-import { Request, Express }  from 'express';
-import { IEvent } from '../models/events';
+/* tslint:disable:no-any */
+
+import { Request, Express } from 'express';
+import { Event } from '../models/events';
 import * as mongoose from 'mongoose';
-const Events: any = mongoose.model('Events');
+const events = mongoose.model('Events');
 
 module.exports = (app: Express): void => {
   app.get('/get-non-live-events-amount', getNonLiveEventsAmountData);
@@ -10,11 +12,11 @@ module.exports = (app: Express): void => {
 };
 
 function getNonLiveEventsAmountData(req: Request, res: any): Promise<any> {
-  return Events
+  return events
     .find({live: false})
     .count()
     .lean(true)
-    .exec((err: Error, data: IEvent): Function => {
+    .exec((err: Error, data: Event): Function => {
         return res.json({success: !err, data, error: err});
       }
     );
@@ -47,13 +49,13 @@ function getEventsDataByQuery(req: Request, res: any): Promise<any> {
   }
 
   if (query.findByType) {
-    console.log('no logic yet!');
+    // console.log('no logic yet!');
   }
 
-  return Events
+  return events
     .find(commonQuery)
     .lean(true)
-    .exec((err: Error, data: IEvent): Function => {
+    .exec((err: Error, data: Event): Function => {
         return res.json({success: !err, data, error: err});
       }
     );
@@ -62,7 +64,7 @@ function getEventsDataByQuery(req: Request, res: any): Promise<any> {
 function saveNewEvent(req: Request, res: any): Promise<any> {
   const body: any = req.body;
 
-  let newEvent = new Events(body);
+  const newEvent = new events(body);
 
   return newEvent.save((err: Error): Function => {
     return res.json({success: !err, data: 'user saved', error: err});
