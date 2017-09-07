@@ -1,3 +1,5 @@
+/* tslint:disable:no-any */
+
 import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose';
 

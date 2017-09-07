@@ -6,7 +6,7 @@ import { Schema } from 'mongoose';
  @property {String} genres - genres of a music
  */
 
-export interface ICity extends mongoose.Document {
+export interface City extends mongoose.Document {
   city: string;
   country: string;
   lat: number;

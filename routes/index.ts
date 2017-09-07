@@ -1,7 +1,7 @@
-import { Express }  from 'express';
+import { Express } from 'express';
 
 export class Routes {
-  public constructor(app: Express) {
+  constructor(app: Express) {
     require('./search-filters')(app);
     require('./user-signup')(app);
     require('./faq')(app);
