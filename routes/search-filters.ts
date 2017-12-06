@@ -5,10 +5,10 @@ import { Request, Express } from 'express';
 import { head } from 'lodash';
 import * as mongoose from 'mongoose';
 
-const genres: any = mongoose.model('Genres');
-const countries: any = mongoose.model('Countries');
-const users: any = mongoose.model('Users');
-const events: any = mongoose.model('Events');
+const genres = mongoose.model('Genres');
+const countries = mongoose.model('Countries');
+const users = mongoose.model('Users');
+const events = mongoose.model('Events');
 
 module.exports = (app: Express): void => {
   app.get('/music-styles', getMusicStyles);

@@ -33,11 +33,11 @@ import { Schema } from 'mongoose';
 const usersSchema = new Schema({
   active: Boolean,
   avatar: String,
+  email: {type: String, unique: true},
   username: String,
   firstName: String,
   lastName: String,
   gender: String,
-  email: {type: String, unique: true},
   role: {type: String, default: 'user'},
   type: String,
   position: String,
@@ -60,6 +60,16 @@ const usersSchema = new Schema({
     google: String,
     facebook: String,
     twitter: String
+  },
+  statistics: {
+    likes: {
+      liked: [String],
+      likeUser: [String],
+      likeShow: [String]
+    },
+    viewers: [String],
+    followers: [String],
+    following: [String]
   },
   comments: [],
   reviews: [],

@@ -9,7 +9,27 @@ import { Schema } from 'mongoose';
  */
 
 export interface Event extends mongoose.Document {
-    showName: string;
+    name: string;
+    creator: string;
+    description: string;
+    artist: string;
+    genres: string[];
+    posters: string[];
+    audios: string[];
+    videos: string[];
+    appreciations: string[];
+    info: string;
+    live: boolean;
+    completed: boolean;
+    location: {
+        country: string;
+    };
+    dateCreated: string;
+    datePerformance: string;
+    timePerfomance: {
+        start: string;
+        end: string;
+    };
     tickets: {
         count: number;
         ticketPrice: number;
@@ -17,30 +37,38 @@ export interface Event extends mongoose.Document {
         ticketsSold: number;
         fundedPercentage: number;
     };
-    creator: string;
-    dateCreated: string;
-    showLocation: string;
-    datePerformance: string;
-    timePerfomance: {
-        start: string;
-        end: string;
+    statisctics: {
+        likes: string[];
+        viewers: string[];
+        followers: string[];
     };
-    artist: string;
-    genres: string[];
-    poster: any;
-    description: string;
-    audio: string;
-    video: string;
-    info: string;
-    live: boolean;
-    appreciations: any;
     wowza: {
         id: string;
     };
 }
 
 export const eventsSchema = new Schema({
-    showName: String,
+    name: String,
+    creator: String,
+    description: String,
+    artist: String,
+    genres: [String],
+    posters: [String],
+    audios: [String],
+    videos: [String],
+    appreciations: [String],
+    info: String,
+    live: Boolean,
+    completed: Boolean,
+    location: {
+        country: String
+    },
+    dateCreated: String,
+    datePerformance: String,
+    timePerfomance: {
+        start: String,
+        end: String
+    },
     tickets: {
         count: Number,
         ticketPrice: Number,
@@ -48,23 +76,11 @@ export const eventsSchema = new Schema({
         ticketsSold: Number,
         fundedPercentage: Number
     },
-    creator: String,
-    dateCreated: String,
-    showLocation: String,
-    datePerformance: String,
-    timePerfomance: {
-        start: String,
-        end: String
+    statisctics: {
+        likes: [String],
+        viewers: [String],
+        followers: [String]
     },
-    artist: String,
-    genres: [String],
-    poster: Object,
-    description: String,
-    audio: String,
-    video: String,
-    info: String,
-    live: Boolean,
-    appreciations: Object,
     wowza: {
         id: String
     }
