@@ -14,8 +14,8 @@ export class AppConfig {
     }
 
     if (!nconf.get('MONGO_DB')) {
-      // nconf.set('MONGO_DB', 'mongodb://localhost/livestarter');
-      nconf.set('MONGO_DB', 'mongodb://maxie:livestarter2017@ds061355.mlab.com:61355/livestarter');
+      nconf.set('MONGO_DB', 'mongodb://localhost/livestarter');
+      // nconf.set('MONGO_DB', 'mongodb://maxie:livestarter2017@ds061355.mlab.com:61355/livestarter');
     }
 
     app.set('nconf', nconf);

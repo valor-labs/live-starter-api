@@ -6,11 +6,9 @@ import { Schema } from 'mongoose';
  @property {String} genres - genres of a music
  */
 const countriesSchema = new Schema({
-  code: String,
-  country: String,
-  lat: Number,
-  lng: Number,
-  alias: String
+  id: String,
+  sortname: String,
+  name: String
 });
 
 export default mongoose.model('Countries', countriesSchema);
