@@ -9,50 +9,65 @@ import { Schema } from 'mongoose';
  */
 
 export interface Event extends mongoose.Document {
-  showName: string;
-  tickets: number;
-  fundedPercentage: number;
-  ticketsSold: number;
-  ticketsToFund: number;
-  ticketPrice: number;
-  creator: string;
-  showLocation: string;
-  dateCreated: any;
-  datePerformance: string;
-  artist: string;
-  genre: any;
-  description: string;
-  audio: string;
-  video: string;
-  info: string;
-  live: boolean;
-  appreciations: any;
+    showName: string;
+    tickets: {
+        count: number;
+        ticketPrice: number;
+        ticketsToFund: number;
+        ticketsSold: number;
+        fundedPercentage: number;
+    };
+    creator: string;
+    dateCreated: string;
+    showLocation: string;
+    datePerformance: string;
+    timePerfomance: {
+        start: string;
+        end: string;
+    };
+    artist: string;
+    genres: string[];
+    poster: any;
+    description: string;
+    audio: string;
+    video: string;
+    info: string;
+    live: boolean;
+    appreciations: any;
+    wowza: {
+        id: string;
+    };
 }
 
 export const eventsSchema = new Schema({
-  showName: String,
-  tickets: Number,
-  fundedPercentage: Number,
-  ticketsSold: Number,
-  ticketsToFund: Number,
-  ticketPrice: Number,
-  creator: String,
-  showLocation: String,
-  dateCreated: String,
-  datePerformance: String,
-  artist: String,
-  genre: [String],
-  description: String,
-  audio: [String],
-  video: [String],
-  info: String,
-  live: Boolean,
-  appreciations: {
-    views: Number,
-    likes: Number,
-    followers: Number,
-    shows: Number
-  }
+    showName: String,
+    tickets: {
+        count: Number,
+        ticketPrice: Number,
+        ticketsToFund: Number,
+        ticketsSold: Number,
+        fundedPercentage: Number
+    },
+    creator: String,
+    dateCreated: String,
+    showLocation: String,
+    datePerformance: String,
+    timePerfomance: {
+        start: String,
+        end: String
+    },
+    artist: String,
+    genres: [String],
+    poster: Object,
+    description: String,
+    audio: String,
+    video: String,
+    info: String,
+    live: Boolean,
+    appreciations: Object,
+    wowza: {
+        id: String
+    }
 });
 
 export default mongoose.model('Events', eventsSchema);
