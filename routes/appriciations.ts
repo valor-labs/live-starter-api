@@ -16,7 +16,7 @@ module.exports = (app: Express): void => {
 };
 
 function appreciateArtist(req: Request, res: any): Promise<any> | Function {
-  const body: any = req.body;
+  const body = req.body;
 
   if (!body.email) {
     return res.json({
@@ -35,10 +35,10 @@ function appreciateArtist(req: Request, res: any): Promise<any> | Function {
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
-      const found: any = head(data);
-      const apprs: any[] = found.appreciations || [];
+      const found = head(data);
+      const apprs = found.appreciations || [];
       const query: string = body.email;
-      const founded = find(apprs, (item: any): any => {
+      const founded = find(apprs, item => {
         return item === query;
       });
 
@@ -67,7 +67,7 @@ function appreciateArtist(req: Request, res: any): Promise<any> | Function {
 }
 
 function appreciateEvent(req: Request, res: any): Promise<any> | Function {
-  const body: any = req.body;
+  const body = req.body;
 
   if (!body.email) {
     return res.json({
@@ -86,10 +86,10 @@ function appreciateEvent(req: Request, res: any): Promise<any> | Function {
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
-      const found: any = head(data);
-      const apprs: any[] = found.appreciations || [];
+      const found = head(data);
+      const apprs = found.appreciations || [];
       const query: string = body.email;
-      const founded = find(apprs, (item: any): any => {
+      const founded = find(apprs, item => {
         return item === query;
       });
 
@@ -118,7 +118,7 @@ function appreciateEvent(req: Request, res: any): Promise<any> | Function {
 }
 
 function appreciateSong(req: Request, res: any): Promise<any> | Function {
-  const body: any = req.body;
+  const body = req.body;
 
   if (!body.email) {
     return res.json({
@@ -140,7 +140,7 @@ function appreciateSong(req: Request, res: any): Promise<any> | Function {
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
-      const getEvent: any = head(data);
+      const getEvent = head(data);
       const songs: any[] = getEvent.audio || [];
       const getSong = find(songs, (song: any) => song.name === body.name);
       const getSongIndex = findIndex(songs, (song: any) => song.name === body.name);
@@ -176,7 +176,7 @@ function appreciateSong(req: Request, res: any): Promise<any> | Function {
 }
 
 function appreciateVideo(req: Request, res: any): Promise<any> | Function {
-  const body: any = req.body;
+  const body = req.body;
 
   if (!body.email) {
     return res.json({
@@ -198,7 +198,7 @@ function appreciateVideo(req: Request, res: any): Promise<any> | Function {
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
-      const getEvent: any = head(data);
+      const getEvent = head(data);
       const videos: any[] = getEvent.video || [];
       const getVideo = find(videos, (video: any) => video.name === body.name);
       const getVideoIndex = findIndex(videos, (video: any) => video.name === body.name);

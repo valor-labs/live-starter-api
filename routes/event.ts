@@ -31,7 +31,11 @@ function getEventsDataByQuery(req: Request, res: any): Promise<any> {
     commonQuery.creator = {$ne: query.exceptByName};
   }
 
-  if (query.findByCreator && query.findByName) {
+  if (query.findById) {
+      commonQuery._id = query.findById;
+  }
+
+  if (query.findByCreator && query.findByName && !query.findById) {
     commonQuery.showName = query.findByName;
     commonQuery.creator = query.findByCreator;
   }
@@ -46,10 +50,6 @@ function getEventsDataByQuery(req: Request, res: any): Promise<any> {
 
   if (query.findByLocation) {
     commonQuery.showLocation = query.findByLocation;
-  }
-
-  if (query.findByType) {
-    // console.log('no logic yet!');
   }
 
   return events

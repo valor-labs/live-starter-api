@@ -4,9 +4,9 @@ import * as async from 'async';
 import * as mongoose from 'mongoose';
 import { Request, Express } from 'express';
 
-const users: any = mongoose.model('Users');
-const countries: any = mongoose.model('Countries');
-const cities: any = mongoose.model('Cities');
+const users = mongoose.model('Users');
+const countries = mongoose.model('Countries');
+const cities = mongoose.model('Cities');
 
 module.exports = (app: Express): void => {
   app.get('/signup/get-locations', getLocations);
@@ -42,7 +42,7 @@ function getUserData(req: Request, res: any): Promise<any> | Function {
 }
 
 function editUser(req: Request, res: any): Promise<any> | Function {
-  const body: any = req.body;
+  const body = req.body;
   const userUpdateSet = body.userUpdateSet;
 
   if (!body.email) {
@@ -81,7 +81,7 @@ function editUserAvatar(req: Request, res: any): Promise<any> | Function {
 }
 
 function signUpUser(req: Request, res: any): Promise<any> {
-  const body: any = req.body;
+  const body = req.body;
 
   if (body.username.length === 0) {
     body.username = body.email;

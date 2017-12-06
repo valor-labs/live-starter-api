@@ -7,8 +7,8 @@ import { Schema } from 'mongoose';
  */
 const countriesSchema = new Schema({
   id: String,
-  sortname: String,
-  name: String
+  name: String,
+  sortname: String
 });
 
 export default mongoose.model('Countries', countriesSchema);
