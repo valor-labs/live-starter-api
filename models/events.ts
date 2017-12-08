@@ -17,6 +17,7 @@ export interface Event extends mongoose.Document {
     posters: string[];
     audios: string[];
     videos: string[];
+    buyers: string[];
     appreciations: string[];
     info: string;
     live: boolean;
@@ -37,7 +38,7 @@ export interface Event extends mongoose.Document {
         ticketsSold: number;
         fundedPercentage: number;
     };
-    statisctics: {
+    statistics: {
         likes: string[];
         viewers: string[];
         followers: string[];
@@ -56,6 +57,7 @@ export const eventsSchema = new Schema({
     posters: [String],
     audios: [String],
     videos: [String],
+    buyers: [String],
     appreciations: [String],
     info: String,
     live: Boolean,
@@ -76,7 +78,7 @@ export const eventsSchema = new Schema({
         ticketsSold: Number,
         fundedPercentage: Number
     },
-    statisctics: {
+    statistics: {
         likes: [String],
         viewers: [String],
         followers: [String]
