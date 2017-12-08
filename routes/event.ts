@@ -8,12 +8,13 @@ const events = mongoose.model('Events');
 module.exports = (app: Express): void => {
   app.get('/get-non-live-events-amount', getNonLiveEventsAmountData);
   app.get('/get-events-list-by-query', getEventsDataByQuery);
+  app.get('/get-my-events', getEventsDataByQuery);
   app.post('/save-event', saveNewEvent);
 };
 
 function getNonLiveEventsAmountData(req: Request, res: any): Promise<any> {
   return events
-    .find({live: false})
+    .find({live: false}, {buyers: false})
     .count()
     .lean(true)
     .exec((err: Error, data: Event): Function => {
@@ -32,7 +33,11 @@ function getEventsDataByQuery(req: Request, res: any): Promise<any> {
   }
 
   if (query.findById) {
-      commonQuery._id = query.findById;
+    commonQuery._id = query.findById;
+  }
+
+  if (query.findByBuyers) {
+    commonQuery.buyers = query.findByBuyers;
   }
 
   if (query.findByCreator && query.findByName && !query.findById) {
@@ -53,16 +58,31 @@ function getEventsDataByQuery(req: Request, res: any): Promise<any> {
   }
 
   return events
-    .find(commonQuery)
+    .find(commonQuery, {buyers: false})
     .lean(true)
-    .exec((err: Error, data: Event): Function => {
-        return res.json({success: !err, data, error: err});
-      }
-    );
+    .exec((err: Error, data: any): Function => {
+      const newData = data.map(show => {
+        return {
+          ...show,
+          ...{
+            statistics: {
+              followers: show.statistics.followers.length,
+              viewers: show.statistics.viewers.length,
+              likes: show.statistics.likes.length
+            }
+          }
+        };
+      });
+
+      return res.json({success: !err, data: newData, error: err});
+    });
 }
 
 function saveNewEvent(req: Request, res: any): Promise<any> {
-  const body: any = req.body;
+  const body = {
+    ...req.body,
+    ...{buyers: []}
+  };
 
   const newEvent = new events(body);
 

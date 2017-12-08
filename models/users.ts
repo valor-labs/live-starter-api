@@ -55,7 +55,10 @@ const usersSchema = new Schema({
     skype: String,
     hangouts: String
   },
-  shows: [],
+  shows: {
+    owned: [],
+    purchased: []
+  },
   socials: {
     google: String,
     facebook: String,
