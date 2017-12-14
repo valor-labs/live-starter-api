@@ -35,7 +35,7 @@ function appreciateArtist(req: Request, res: any): Promise<any> | Function {
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
-      const found = head(data);
+      const found: {appreciations?: string[]} = head(data);
       const apprs = found.appreciations || [];
       const query: string = body.email;
       const founded = find(apprs, item => {
@@ -86,7 +86,7 @@ function appreciateEvent(req: Request, res: any): Promise<any> | Function {
         return res.json({success: !err, data: 'DB error occured', error: err});
       }
 
-      const found = head(data);
+      const found: {appreciations?: string[]} = head(data);
       const apprs = found.appreciations || [];
       const query: string = body.email;
       const founded = find(apprs, item => {
