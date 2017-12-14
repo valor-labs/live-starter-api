@@ -1,12 +1,14 @@
 import { Config } from './config';
 import './models';
 import { Routes } from './routes';
+import * as path from 'path';
+import * as express from 'express';
 
 // const mongoose = require('mongoose');
-const express = require('express');
 
 const app = express();
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // mongoose.Promise = Promise;
 
 new Config(app);

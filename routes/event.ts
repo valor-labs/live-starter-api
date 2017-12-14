@@ -86,7 +86,7 @@ function saveNewEvent(req: Request, res: any): Promise<any> {
 
   const newEvent = new events(body);
 
-  return newEvent.save((err: Error): Function => {
-    return res.json({success: !err, data: 'user saved', error: err});
+  return newEvent.save((err: Error, data: any): Function => {
+    return res.json({success: !err, data: {message: 'user saved', newId: data._id}, error: err});
   });
 }

@@ -8,5 +8,6 @@ export class Routes {
     require('./faq')(app);
     require('./event')(app);
     require('./appriciations')(app);
+    require('./upload-files')(app);
   }
 }
