@@ -30,6 +30,59 @@ import { Schema } from 'mongoose';
  @property {String} audio - links to audio files uploaded by user
  @property {String} photo - links to photo files uploaded by user
  */
+
+export interface User extends mongoose.Document {
+  _id: string;
+  active: boolean;
+  avatar: string;
+  email: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  role: string;
+  type: string;
+  position: string;
+  city: string;
+  country: string;
+  groupName: string;
+  website: string;
+  joinDate: Date;
+  biography: string;
+  contacts: {
+    phone: string;
+    skype: string;
+    hangouts: string;
+  };
+  shows: {
+    owned: string[];
+    purchased: string[];
+  };
+  socials: {
+    google: string;
+    facebook: string;
+    twitter: string;
+  };
+  statistics: {
+    likes: {
+      liked: string[],
+      likeUser: string[],
+      likeShow: string[]
+    },
+    viewers: number,
+    followers: number,
+    following: number
+  };
+  viewers: string[];
+  appreciations: string[];
+  comments: string[];
+  reviews: string[];
+  videos: string[];
+  audios: string[];
+  photos: string[];
+  genres: string[];
+}
+
 const usersSchema = new Schema({
   active: Boolean,
   avatar: String,
@@ -43,10 +96,7 @@ const usersSchema = new Schema({
   position: String,
   city: String,
   country: String,
-  viewers: [],
-  appreciations: [],
-  followers: [],
-  followings: [],
+  groupName: String,
   website: String,
   joinDate: String,
   biography: String,
@@ -56,8 +106,8 @@ const usersSchema = new Schema({
     hangouts: String
   },
   shows: {
-    owned: [],
-    purchased: []
+    owned: [String],
+    purchased: [String]
   },
   socials: {
     google: String,
@@ -74,13 +124,14 @@ const usersSchema = new Schema({
     followers: [String],
     following: [String]
   },
-  comments: [],
-  reviews: [],
-  video: [],
-  audio: [],
-  photo: [],
-  genres: [],
-  groupName: String
+  viewers: [String],
+  appreciations: [String],
+  comments: [String],
+  reviews: [String],
+  videos: [String],
+  audios: [String],
+  photos: [String],
+  genres: [String]
 });
 
 export default mongoose.model('Users', usersSchema);
