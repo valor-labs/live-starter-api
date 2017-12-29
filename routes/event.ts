@@ -1,9 +1,21 @@
 /* tslint:disable:no-any */
 
-import { Request, Express } from 'express';
+import { Request, Response, Express } from 'express';
 import { Event } from '../models/events';
 import * as mongoose from 'mongoose';
+
 const events = mongoose.model('Events');
+const users = mongoose.model('Users');
+
+interface CommonQuery {
+  showName?: {$ne: string};
+  creator?: {$ne: string};
+  _id?: string;
+  buyers?: string;
+  genre?: {$in: string[]};
+  datePerformance?: string;
+  showLocation?: string;
+}
 
 module.exports = (app: Express): void => {
   app.get('/get-non-live-events-amount', getNonLiveEventsAmountData);
@@ -12,20 +24,20 @@ module.exports = (app: Express): void => {
   app.post('/save-event', saveNewEvent);
 };
 
-function getNonLiveEventsAmountData(req: Request, res: any): Promise<any> {
-  return events
+function getNonLiveEventsAmountData(req: Request, res: Response): void {
+  events
     .find({live: false}, {buyers: false})
     .count()
     .lean(true)
-    .exec((err: Error, data: Event): Function => {
-        return res.json({success: !err, data, error: err});
+    .exec((err: Error, data: Event): void => {
+        res.json({success: !err, data, error: err});
       }
     );
 }
 
-function getEventsDataByQuery(req: Request, res: any): Promise<any> {
+function getEventsDataByQuery(req: Request, res: Response): void {
   const query = req.query;
-  const commonQuery: any = {};
+  const commonQuery: CommonQuery = {};
 
   if (query.exceptByName && query.exceptByCreator) {
     commonQuery.showName = {$ne: query.exceptByName};
@@ -57,10 +69,10 @@ function getEventsDataByQuery(req: Request, res: any): Promise<any> {
     commonQuery.showLocation = query.findByLocation;
   }
 
-  return events
+  events
     .find(commonQuery, {buyers: false})
     .lean(true)
-    .exec((err: Error, data: any): Function => {
+    .exec((err: Error, data: Event[]): void => {
       const newData = data.map(show => {
         return {
           ...show,
@@ -74,11 +86,11 @@ function getEventsDataByQuery(req: Request, res: any): Promise<any> {
         };
       });
 
-      return res.json({success: !err, data: newData, error: err});
+      res.json({success: !err, data: newData, error: err});
     });
 }
 
-function saveNewEvent(req: Request, res: any): Promise<any> {
+function saveNewEvent(req: Request, res: Response): void {
   const body = {
     ...req.body,
     ...{buyers: []}
@@ -86,7 +98,22 @@ function saveNewEvent(req: Request, res: any): Promise<any> {
 
   const newEvent = new events(body);
 
-  return newEvent.save((err: Error, data: any): Function => {
-    return res.json({success: !err, data: {message: 'user saved', newId: data._id}, error: err});
+  newEvent.save((err: Error, event: Event): void | undefined => {
+    if (err) {
+      res.json({success: !err, data: null, err});
+
+      return undefined;
+    }
+
+    users.update(
+      {_id: body.creator},
+      {
+        $push: {
+          'shows.owned': event._id
+        }
+      })
+      .exec((error: Error, data: {n: number, nModified: number, ok: number}): void => {
+        res.json({success: !err, data: {message: 'user saved', newId: event._id}, error: err});
+      });
   });
 }
