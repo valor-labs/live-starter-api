@@ -1,125 +1,177 @@
 /* tslint:disable:no-any */
 
 import * as mongoose from 'mongoose';
-import { Request, Express } from 'express';
+import { Request, Express, Response } from 'express';
+
+import { User } from '../models/users';
+import { Event } from '../models/events';
+import { LikingResponse } from '../models/likingResponse.interface';
 
 const users = mongoose.model('Users');
 const events = mongoose.model('Events');
 
 module.exports = (app: Express): void => {
   app.post('/show-like', likeShow);
+  app.post('/artist-like', likeUser);
 };
 
-function likeShow(req: Request, res: any): Promise<any> | Function {
-  const body = req.body;
+function updateLiker(query, isShowLike: boolean, isUpdateLikee = false): Promise<LikingResponse> {
+  const userQueryId = isUpdateLikee ? query.likee : query.liker;
 
-  if (!body.liker || !body.likee) {
-    return res.json({
-      success: true, data: 'like was failing', error: 'liker or likee are empty. ' +
-      'Update without thats prohibited.'
-    });
-  }
-
-  users
-    .find({_id: body.liker})
+  return users
+    .findOne({_id: userQueryId})
     .lean(true)
-    .exec((err: Error, data): void => {
-      if (err) {
-        return res.json({success: !err, data: null, error: err});
+    .exec()
+    .then((user: User) => {
+      let statistics;
+      let updatingObj;
+      let isUnlike = false;
+
+      if (isUpdateLikee) {
+        statistics = user.statistics.likes.liked;
+        isUnlike = statistics.includes(query.liker);
+        updatingObj = {
+          'statistics.likes.liked': query.liker
+        };
       }
 
-      const statistics = data[0].statistics.likes.likeShow;
-      const isUnlike = statistics.includes(body.likee);
+      if (!isUpdateLikee) {
+        if (isShowLike) {
+          statistics = user.statistics.likes.likeShow;
+          updatingObj = {
+            'statistics.likes.likeShow': query.likee
+          };
+        }
+
+        if (!isShowLike) {
+          statistics = user.statistics.likes.likeUser;
+
+          updatingObj = {
+            'statistics.likes.likeUser': query.likee
+          };
+        }
+
+        isUnlike = statistics.includes(query.likee);
+      }
 
       if (isUnlike) {
-        users
+        return users
           .update(
-            {_id: body.liker},
+            {_id: userQueryId},
             {
-              $pull: {
-                'statistics.likes.likeShow': body.likee
-              }
+              $pull: updatingObj
             })
-          .exec((error: Error, newData): void => {
-            if (error) {
-              return res.json({success: !error, data: null, error});
+          .exec()
+          .then(() => {
+            if (isUpdateLikee) {
+              return {
+                message: 'show model unliked',
+                likesCount: statistics.length ? statistics.length - 1 : 0
+              };
             }
           });
-
-        return;
       }
 
-      users
+      return users
         .update(
-          {_id: body.liker},
+          {_id: userQueryId},
           {
-            $push: {
-              'statistics.likes.likeShow': body.likee
-            }
+            $push: updatingObj
           }
         )
-        .exec((error: Error, newData): void => {
-          if (error) {
-            return res.json({success: !error, data: null, error});
+        .exec()
+        .then(() => {
+          if (isUpdateLikee) {
+            return {
+              message: 'show model liked',
+              likesCount: statistics.length + 1
+            };
           }
         });
     });
+}
 
+function updateShow(query): Promise<LikingResponse> {
   return events
-    .find({_id: body.likee})
-    .limit(1)
+    .findOne({_id: query.likee})
     .lean(true)
-    .exec((err: Error, show): Promise<any> => {
-      if (err) {
-        return res.json({success: !err, data: null, error: err});
-      }
-
-      const statistics = show[0].statistics.likes;
-      const isUnlike = statistics.includes(body.liker);
+    .exec()
+    .then((event: Event) => {
+      const isUnlike = event.statistics.likes.includes(query.liker);
 
       if (isUnlike) {
         return events
           .update(
-            {_id: body.likee},
+            {_id: query.likee},
             {
               $pull: {
-                'statistics.likes': body.liker
+                'statistics.likes': query.liker
               }
             })
-          .exec((error: Error, newData): Function => {
-            if (error) {
-              return res.json({success: !error, data: null, error});
-            }
-
-            const responseObj = {
+          .then(() => {
+            return {
               message: 'show model unliked',
-              likesCount: show[0].statistics.likes.length ? show[0].statistics.likes.length - 1 : 0
+              likesCount: event.statistics.likes.length ? event.statistics.likes.length - 1 : 0
             };
-
-            return res.json({success: !error, data: responseObj, error});
           });
       }
 
       return events
         .update(
-          {_id: body.likee},
+          {_id: query.likee},
           {
             $push: {
-              'statistics.likes': body.liker
+              'statistics.likes': query.liker
             }
-          }
-        )
-        .exec((error: Error, newData): Function => {
-          if (error) {
-            return res.json({success: !error, data: null, error});
-          }
-
-          const responseObj = {
+          })
+        .then(() => {
+          return {
             message: 'show model liked',
-            likesCount: show[0].statistics.likes.length + 1
+            likesCount: event.statistics.likes.length + 1
           };
-
-          return res.json({success: !error, data: responseObj, error});
         });
+
     });
+}
+
+async function likeShow(req: Request, res: Response): Promise<void> {
+  const body = req.body;
+
+  if (!body.liker || !body.likee) {
+    const status = 500;
+    res.status(status).send({message: 'liker or likee are empty. Update without thats prohibited.'});
+  }
+
+  try {
+    await updateLiker(body, true);
+
+    await updateShow(body)
+      .then(respObj => {
+        res.json(respObj);
+      });
+  } catch (error) {
+    const status = 500;
+    res.status(status).send(error);
+  }
+}
+
+async function likeUser(req: Request, res: Response): Promise<void> {
+  const body = req.body;
+
+  if (!body.liker || !body.likee) {
+    const status = 500;
+    res.status(status).send({message: 'liker or likee are empty. Update without thats prohibited.'});
+  }
+
+  try {
+    await updateLiker(body, false);
+
+    await updateLiker(body, false, true)
+      .then((respObj: LikingResponse) => {
+        res.json(respObj);
+      });
+  } catch (error) {
+    const status = 500;
+    res.status(status).send(error);
+  }
 }

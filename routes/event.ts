@@ -3,6 +3,7 @@
 import { Request, Response, Express } from 'express';
 import { Event } from '../models/events';
 import * as mongoose from 'mongoose';
+import { UpdatedDb } from '../models/updatedDB.interface';
 
 const events = mongoose.model('Events');
 const users = mongoose.model('Users');
@@ -112,7 +113,7 @@ function saveNewEvent(req: Request, res: Response): void {
           'shows.owned': event._id
         }
       })
-      .exec((error: Error, data: {n: number, nModified: number, ok: number}): void => {
+      .exec((error: Error, data: UpdatedDb): void => {
         res.json({success: !err, data: {message: 'user saved', newId: event._id}, error: err});
       });
   });
