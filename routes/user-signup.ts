@@ -47,7 +47,7 @@ function getUserData(req: Request, res: Response): void | undefined {
       ...user,
       ...{
         statistics: {
-            following: user.statistics.following.length,
+            followings: user.statistics.followings.length,
             followers: user.statistics.followers.length,
             viewers: user.statistics.viewers.length,
             likes: {
@@ -122,7 +122,7 @@ function signUpUser(req: Request, res: Response): void | undefined {
         },
         viewers: [],
         followers: [],
-        following: []
+        followings: []
       },
       shows: {
         owned: [],

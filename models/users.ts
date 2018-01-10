@@ -71,7 +71,7 @@ export interface User extends mongoose.Document {
     },
     viewers: string[],
     followers: string[],
-    following: string[]
+    followings: string[]
   };
   viewers: string[];
   appreciations: string[];
@@ -122,7 +122,7 @@ const usersSchema = new Schema({
     },
     viewers: [String],
     followers: [String],
-    following: [String]
+    followings: [String]
   },
   viewers: [String],
   appreciations: [String],
