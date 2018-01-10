@@ -9,5 +9,6 @@ export class Routes {
     require('./event')(app);
     require('./appriciations')(app);
     require('./upload-files')(app);
+    require('./follow')(app);
   }
 }
