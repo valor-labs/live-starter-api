@@ -20,8 +20,9 @@ module.exports = (app: Express): void => {
   app.post('/edit-profile/edit-user-avatar', editUserAvatar);
 };
 
-interface GetUserDataInterface {
-  email: string;
+export interface GetUserDataInterface {
+  email?: string;
+  _id?: string;
 }
 
 interface EditUserAvatarInterface {
@@ -32,17 +33,37 @@ interface EditUserAvatarInterface {
 function getUserData(req: Request, res: Response): void | undefined {
   const query: GetUserDataInterface = req.query;
 
-  if (!query.email) {
+  if (!query.email && !query._id) {
     res.json({success: false, data: 'user data failed', error: 'User has no email.'});
 
     return undefined;
   }
 
   users
-    .findOne({email: query.email})
+    .findOne(query)
     .lean(true)
     .exec((err: Error, user: User): void => {
-      res.json({success: true, data: user, error: err});
+      const newData = {
+      ...user,
+      ...{
+        statistics: {
+            following: user.statistics.following.length,
+            followers: user.statistics.followers.length,
+            viewers: user.statistics.viewers.length,
+            likes: {
+              likeShow: user.statistics.likes.likeShow.length,
+              likeUser: user.statistics.likes.likeUser.length,
+              liked: user.statistics.likes.liked.length
+            }
+          }
+        },
+        shows: {
+          owned: user.shows.owned.length,
+          purchased: user.shows.purchased.length
+        }
+      };
+
+      res.json({success: true, data: newData, error: err});
     });
 }
 

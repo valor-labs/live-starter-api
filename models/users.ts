@@ -54,7 +54,7 @@ export interface User extends mongoose.Document {
     skype: string;
     hangouts: string;
   };
-  shows: {
+  shows?: {
     owned: string[];
     purchased: string[];
   };
@@ -63,15 +63,15 @@ export interface User extends mongoose.Document {
     facebook: string;
     twitter: string;
   };
-  statistics: {
+  statistics?: {
     likes: {
       liked: string[],
       likeUser: string[],
       likeShow: string[]
     },
-    viewers: number,
-    followers: number,
-    following: number
+    viewers: string[],
+    followers: string[],
+    following: string[]
   };
   viewers: string[];
   appreciations: string[];
