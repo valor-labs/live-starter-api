@@ -13,21 +13,21 @@ export interface Event extends mongoose.Document {
     creator: string;
     description: string;
     artist: string;
+    info: string;
     genres: string[];
     posters: string[];
     audios: string[];
     videos: string[];
     buyers: string[];
     appreciations: string[];
-    info: string;
     live: boolean;
     completed: boolean;
     location: {
         country: string;
     };
-    dateCreated: string;
-    datePerformance: string;
-    timePerfomance: {
+    dateCreated: number;
+    datePerformance: number;
+    timePerformance: {
         start: string;
         end: string;
     };
@@ -65,9 +65,9 @@ export const eventsSchema = new Schema({
     location: {
         country: String
     },
-    dateCreated: String,
-    datePerformance: String,
-    timePerfomance: {
+    dateCreated: { type: Date, default: Date.now },
+    datePerformance: { type: Date, default: Date.now },
+    timePerformance: {
         start: String,
         end: String
     },

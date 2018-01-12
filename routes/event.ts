@@ -14,7 +14,7 @@ interface CommonQuery {
   _id?: string;
   buyers?: string;
   genre?: {$in: string[]};
-  datePerformance?: string;
+  datePerformance?: {$gt: Date, $lt: Date};
   showLocation?: string;
 }
 
@@ -58,8 +58,8 @@ function getEventsDataByQuery(req: Request, res: Response): void {
     commonQuery.creator = query.findByCreator;
   }
 
-  if (query.findByDate) {
-    commonQuery.datePerformance = query.findByDate;
+  if (query.startDate && query.endDate) {
+    commonQuery.datePerformance = {$gt: new Date(+query.startDate), $lt: new Date(+query.endDate)};
   }
 
   if (query.findByGenre) {
