@@ -3,7 +3,7 @@
 import { Request, Response, Express } from 'express';
 import { Event } from '../models/events';
 import * as mongoose from 'mongoose';
-import { UpdatedDb } from '../models/updatedDB.interface';
+import { ObjectID } from 'bson';
 
 const events = mongoose.model('Events');
 const users = mongoose.model('Users');
@@ -11,10 +11,11 @@ const users = mongoose.model('Users');
 interface CommonQuery {
   showName?: {$ne: string};
   creator?: {$ne: string};
-  _id?: string;
+  _id?: ObjectID | {$ne: ObjectID};
   buyers?: string;
   genre?: {$in: string[]};
-  datePerformance?: {$gt: Date, $lt: Date};
+  genres?: {$in: string[]};
+  datePerformance?: {$gt: Date, $lt?: Date};
   showLocation?: string;
 }
 
@@ -30,15 +31,32 @@ function getNonLiveEventsAmountData(req: Request, res: Response): void {
     .find({live: false}, {buyers: false})
     .count()
     .lean(true)
-    .exec((err: Error, data: Event): void => {
-        res.json({success: !err, data, error: err});
-      }
-    );
+    .exec()
+    .then(data => {
+        res.json(data);
+    })
+    .catch(err => {
+      const status = 500;
+      res.status(status).send({message: err});
+    });
 }
 
 function getEventsDataByQuery(req: Request, res: Response): void {
   const query = req.query;
+  const limit: number | null = query.limit ? +query.limit : null;
   const commonQuery: CommonQuery = {};
+
+  if (query.genres) {
+    commonQuery.genres = {$in: query.genres.split(',')};
+  }
+
+  if (query.exceptById) {
+    commonQuery._id = {$ne: new ObjectID(query.exceptById)};
+  }
+
+  if (query.minDate) {
+    commonQuery.datePerformance = {$gt: new Date(query.minDate)};
+  }
 
   if (query.exceptByName && query.exceptByCreator) {
     commonQuery.showName = {$ne: query.exceptByName};
@@ -63,7 +81,7 @@ function getEventsDataByQuery(req: Request, res: Response): void {
   }
 
   if (query.findByGenre) {
-    commonQuery.genre = {$in: [query.findByGenre]};
+    commonQuery.genres = {$in: [query.findByGenre]};
   }
 
   if (query.findByLocation) {
@@ -72,8 +90,10 @@ function getEventsDataByQuery(req: Request, res: Response): void {
 
   events
     .find(commonQuery, {buyers: false})
+    .limit(limit)
     .lean(true)
-    .exec((err: Error, data: Event[]): void => {
+    .exec()
+    .then((data: Event[]) => {
       const newData = data.map(show => {
         return {
           ...show,
@@ -87,7 +107,11 @@ function getEventsDataByQuery(req: Request, res: Response): void {
         };
       });
 
-      res.json({success: !err, data: newData, error: err});
+      res.json(newData);
+    })
+    .catch(err => {
+      const status = 500;
+      res.status(status).send({message: err});
     });
 }
 
@@ -99,22 +123,26 @@ function saveNewEvent(req: Request, res: Response): void {
 
   const newEvent = new events(body);
 
-  newEvent.save((err: Error, event: Event): void | undefined => {
-    if (err) {
-      res.json({success: !err, data: null, err});
-
-      return undefined;
-    }
-
-    users.update(
-      {_id: body.creator},
-      {
-        $push: {
-          'shows.owned': event._id
-        }
-      })
-      .exec((error: Error, data: UpdatedDb): void => {
-        res.json({success: !err, data: {message: 'user saved', newId: event._id}, error: err});
-      });
-  });
+  newEvent.save()
+    .then(event => {
+      users.update(
+        {_id: body.creator},
+        {
+          $push: {
+            'shows.owned': event._id
+          }
+        })
+        .exec()
+        .then(() => {
+          res.json({message: 'user saved', newId: event._id});
+        })
+        .catch(err => {
+          const status = 500;
+          res.status(status).send({message: err});
+        });
+    })
+    .catch(err => {
+      const status = 500;
+      res.status(status).send({message: err});
+    });
 }
