@@ -31,6 +31,57 @@ import { Schema } from 'mongoose';
  @property {String} photo - links to photo files uploaded by user
  */
 
+export interface UserResponse {
+  _id: string;
+  avatar: string;
+  email: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  role: string;
+  type: string;
+  position: string;
+  city: string;
+  country: string;
+  groupName: string;
+  website: string;
+  joinDate?: Date;
+  biography: string;
+  contacts: {
+    phone: string;
+    skype: string;
+    hangouts: string;
+  };
+  shows: {
+    owned: number;
+    purchased: number;
+  };
+  socials: {
+    google: string;
+    facebook: string;
+    twitter: string;
+  };
+  statistics: {
+    likes: {
+      liked: number,
+      likeUser: number,
+      likeShow: number
+    },
+    viewers: number,
+    followers: number,
+    followings: number
+  };
+  viewers?: string[];
+  appreciations: string[];
+  comments: string[];
+  reviews: string[];
+  videos: string[];
+  audios: string[];
+  photos: string[];
+  genres: string[];
+}
+
 export interface User extends mongoose.Document {
   _id: string;
   active: boolean;
