@@ -5,6 +5,7 @@ import * as mongoose from 'mongoose';
 import { Request, Response, Express } from 'express';
 import { User, UserResponse } from '../models/users';
 import { Event } from '../models/events';
+import { getEvent, transformEventToResponceObj } from '../servises/events.service';
 
 const users = mongoose.model('Users');
 const events = mongoose.model('Events');
@@ -201,8 +202,9 @@ async function getUserFollowings(req: Request, res: Response): Promise<void | un
       query: {creator: {$in: followings}, datePerformance: {$gt: new Date()}},
       sort: 'datePerformance'
     };
-    const shows = await getEvent(eventParams) as Event[];
-    const responseObj = shows.map(show => {
+    const shows = await getEvent(eventParams);
+    const transformedShows = transformEventToResponceObj(shows, query.follower);
+    const responseObj = transformedShows.map(show => {
       const userIndex = usrs.findIndex(user => show.creator === user._id.toString());
 
       return {
@@ -253,34 +255,5 @@ export function getUser(params: {[key: string]: any}, isTransform = true)
       });
 
       return params.limit === 1 ? parsedUsers[0] : parsedUsers;
-    });
-}
-
-export function getEvent(params: {[key: string]: any}, isTransform = true): Promise<Event | Event[]> {
-  const projection = params.projection ? {...params.projection, ...{buyers: false}} : {buyers: false};
-
-  return events
-    .find(params.query, projection)
-    .sort(params.sort)
-    .limit(params.limit)
-    .lean(true)
-    .exec()
-    .then((shows: Event[]) => {
-      if (!isTransform) {
-        return params.limit === 1 ? shows[0] : shows;
-      }
-
-      const parsedShows =  shows.map(show => {
-        return {
-        ...show,
-          statistics: {
-            followers: show.statistics.followers.length,
-              viewers: show.statistics.viewers.length,
-              likes: show.statistics.likes.length
-          }
-        };
-      });
-
-      return params.limit === 1 ? parsedShows[0] : parsedShows;
     });
 }
