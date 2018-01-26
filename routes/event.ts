@@ -1,12 +1,14 @@
 /* tslint:disable:no-any */
 
 import { Request, Response, Express } from 'express';
-import { Event } from '../models/events';
 import * as mongoose from 'mongoose';
 import { ObjectID } from 'bson';
 
+import { updateUser } from '../servises/users.service';
+import { getEvent, transformEventToResponceObj, updateEvent } from '../servises/events.service';
+import { UpdateModel } from '../servises/update.interface';
+
 const events = mongoose.model('Events');
-const users = mongoose.model('Users');
 
 interface CommonQuery {
   showName?: {$ne: string};
@@ -23,6 +25,7 @@ module.exports = (app: Express): void => {
   app.get('/get-non-live-events-amount', getNonLiveEventsAmountData);
   app.get('/get-events-list-by-query', getEventsDataByQuery);
   app.get('/get-my-events', getEventsDataByQuery);
+  app.get('/get-free-ticket', getFreeTicket);
   app.post('/save-event', saveNewEvent);
 };
 
@@ -41,7 +44,7 @@ function getNonLiveEventsAmountData(req: Request, res: Response): void {
     });
 }
 
-function getEventsDataByQuery(req: Request, res: Response): void {
+async function getEventsDataByQuery(req: Request, res: Response): Promise<void> {
   const query = req.query;
   const limit: number | null = query.limit ? +query.limit : null;
   const commonQuery: CommonQuery = {};
@@ -68,7 +71,7 @@ function getEventsDataByQuery(req: Request, res: Response): void {
   }
 
   if (query.findByBuyers) {
-    commonQuery.buyers = query.findByBuyers;
+    commonQuery['buyers.userId'] = query.findByBuyers;
   }
 
   if (query.findByCreator && query.findByName && !query.findById) {
@@ -88,61 +91,94 @@ function getEventsDataByQuery(req: Request, res: Response): void {
     commonQuery.showLocation = query.findByLocation;
   }
 
-  events
-    .find(commonQuery, {buyers: false})
-    .limit(limit)
-    .lean(true)
-    .exec()
-    .then((data: Event[]) => {
-      const newData = data.map(show => {
-        return {
-          ...show,
-          ...{
-            statistics: {
-              followers: show.statistics.followers.length,
-              viewers: show.statistics.viewers.length,
-              likes: show.statistics.likes.length
-            }
-          }
-        };
-      });
-
-      res.json(newData);
-    })
-    .catch(err => {
-      const status = 500;
-      res.status(status).send({message: err});
-    });
+  try {
+    const list = await getEvent({query: commonQuery, limit});
+    res.json(transformEventToResponceObj(list, query.userId));
+  } catch (err) {
+    const status = 500;
+    res.status(status).send({message: err});
+  }
 }
 
-function saveNewEvent(req: Request, res: Response): void {
-  const body = {
-    ...req.body,
-    ...{buyers: []}
-  };
+async function saveNewEvent(req: Request, res: Response): Promise<void | undefined> {
+  if (!req.body) {
+    const status = 500;
+    res.status(status).send({message: 'Failed, eventId or userId is empty'});
 
-  const newEvent = new events(body);
+    return undefined;
+  }
 
-  newEvent.save()
-    .then(event => {
-      users.update(
-        {_id: body.creator},
-        {
-          $push: {
-            'shows.owned': event._id
-          }
-        })
-        .exec()
-        .then(() => {
-          res.json({message: 'user saved', newId: event._id});
-        })
-        .catch(err => {
-          const status = 500;
-          res.status(status).send({message: err});
-        });
-    })
-    .catch(err => {
-      const status = 500;
-      res.status(status).send({message: err});
-    });
+  try {
+    const body = {
+      ...req.body,
+      buyers: []
+    };
+
+    const newEvent = await new events(body)
+      .save();
+
+    const params = {
+      conditions: {
+        _id: body.creator
+      },
+      doc: {
+        $push: {
+          'shows.owned': newEvent._id
+        }
+      }
+    };
+    await updateUser(params);
+    res.json({message: 'user saved', newId: newEvent._id});
+
+  } catch (err) {
+    const status = 500;
+    res.status(status).send({message: err});
+  }
+}
+
+async function getFreeTicket(req: Request, res: Response): Promise<void | undefined> {
+  const query = req.query;
+
+  if (!query.eventId && !query.userId) {
+    const status = 500;
+    res.status(status).send({message: 'Failed, eventId or userId is empty'});
+
+    return undefined;
+  }
+
+  try {
+    const getEvtParams = {
+      query: {
+        _id: query.eventId,
+       'buyers.userId': query.userId
+      }
+    };
+
+    const isBuyed = await getEvent(getEvtParams);
+
+    if (isBuyed.length) {
+      res.json({message: 'You have already bought the ticket', isAlreadyExist: true});
+
+      return undefined;
+    }
+
+    const eventParams: UpdateModel = {
+      conditions: {_id: query.eventId},
+      doc: {$push: {buyers: {userId: query.userId, isFree: true}}}
+    };
+
+    await updateEvent(eventParams);
+
+    const userParams: UpdateModel = {
+      conditions: {_id: query.userId},
+      doc: {$push: {'shows.purchased': query.eventId}}
+    };
+
+    await updateUser(userParams);
+
+    res.json({message: 'You have succsefully purchased the ticket', isAlreadyExist: false});
+  } catch (err) {
+    const status = 500;
+    res.status(status).send({message: err});
+  }
 }

@@ -8,6 +8,48 @@ import { Schema } from 'mongoose';
  @property {String} genre - genres of a music
  */
 
+export interface EventResponse {
+  name: string;
+  creator: string;
+  description: string;
+  artist: string;
+  info: string;
+  genres: string[];
+  posters: string[];
+  audios: string[];
+  videos: string[];
+  buyers: number;
+  live: boolean;
+  completed: boolean;
+  isFree: boolean;
+  isFreeForMe: boolean;
+  isBought: boolean;
+  location: {
+    country: string;
+  };
+  dateCreated: number;
+  datePerformance: number;
+  timePerformance: {
+    start: string;
+    end: string;
+  };
+  tickets: {
+    count: number;
+    ticketPrice: number;
+    ticketsToFund: number;
+    ticketsSold: number;
+    fundedPercentage: number;
+  };
+  statistics: {
+    likes: number;
+    viewers: number;
+    followers: number;
+  };
+  wowza: {
+    id: string;
+  };
+}
+
 export interface Event extends mongoose.Document {
     name: string;
     creator: string;
@@ -18,10 +60,11 @@ export interface Event extends mongoose.Document {
     posters: string[];
     audios: string[];
     videos: string[];
-    buyers: string[];
+    buyers: {[key: string]: any}[];
     appreciations: string[];
     live: boolean;
     completed: boolean;
+    isFree: boolean;
     location: {
         country: string;
     };
@@ -57,11 +100,15 @@ export const eventsSchema = new Schema({
     posters: [String],
     audios: [String],
     videos: [String],
-    buyers: [String],
+    buyers: [{
+      userId: String,
+      isFree: Boolean
+    }],
     appreciations: [String],
     info: String,
     live: Boolean,
     completed: Boolean,
+    isFree: Boolean,
     location: {
         country: String
     },
