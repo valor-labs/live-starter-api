@@ -10,5 +10,7 @@ export class Routes {
     require('./appriciations')(app);
     require('./upload-files')(app);
     require('./follow')(app);
+    require('./location')(app);
+    require('./genres')(app);
   }
 }
