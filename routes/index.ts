@@ -5,6 +5,7 @@ export class Routes {
     require('./search-filters')(app);
     require('./user-signup')(app);
     require('./user-statistics')(app);
+    require('./users.route')(app);
     require('./faq')(app);
     require('./event')(app);
     require('./appriciations')(app);
