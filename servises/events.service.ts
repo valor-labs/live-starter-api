@@ -31,7 +31,7 @@ export function getEvent(params: GetEvetInterface): Promise<Event[]> {
     .exec();
 }
 
-export function transformEventToResponceObj(shows: Event[], userId): EventResponse[] {
+export function transformEventToResponceObj(shows: Event[], userId = ''): EventResponse[] {
   return shows.map(show => {
     return {
       ...show,
