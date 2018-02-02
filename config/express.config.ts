@@ -1,16 +1,20 @@
 import * as cors from 'cors';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
+import { Express } from 'express';
 
 export class ExpressConfig {
-  public constructor(app: any) {
-    app.use((req, res, next) => {
-      res.setHeader('Access-Control-Allow-Origin', 'https://livestarter-c828d.firebaseapp.com');
-      res.setHeader('Access-Control-Allow-Methods', 'POST');
-      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-      res.setHeader('Access-Control-Allow-Credentials', true);
-      next();
-    });
+  constructor(app: Express) {
+    const url = 'https://livestarter-c828d.firebaseapp.com';
+    // const url = 'http://localhost:4200';
+
+    const corsOptions = {
+      origin: url,
+      credentials: true
+    };
+
+    app.use(logger('dev'));
+    app.use(cors(corsOptions));
     app.use(logger('dev'));
     app.use(bodyParser.json({limit: '50mb'}));
     app.use(bodyParser.urlencoded({extended: true}));
