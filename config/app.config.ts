@@ -1,8 +1,9 @@
 import * as path from 'path';
 import * as nconf from 'nconf';
+import { Express } from 'express';
 
 export class AppConfig {
-  public constructor(app: any){
+  constructor(app: Express) {
     nconf.argv().env().file(path.join(__dirname, '/env/livestarter.config.json'));
 
     if (!nconf.get('REDIS_PORT')) {
