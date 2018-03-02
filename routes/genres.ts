@@ -1,6 +1,7 @@
 import { Express, Request, Response } from 'express';
 
 import { getGenresFromDB } from '../servises/genres.service';
+import { authCheck } from './auth.route';
 
 module.exports = (app: Express): void => {
   app.get('/get-genres', getGenres);
