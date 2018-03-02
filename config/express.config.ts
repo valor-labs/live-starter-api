@@ -3,13 +3,13 @@ import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import { Express } from 'express';
 
+// export const CLIENT_URL = 'http://localhost:4200';
+export const CLIENT_URL = 'https://livestarter-c828d.firebaseapp.com';
+
 export class ExpressConfig {
   constructor(app: Express) {
-    const url = 'https://livestarter-c828d.firebaseapp.com';
-    // const url = 'http://localhost:4200';
-
     const corsOptions = {
-      origin: url,
+      origin: CLIENT_URL,
       credentials: true
     };
 
