@@ -13,5 +13,6 @@ export class Routes {
     require('./follow')(app);
     require('./location')(app);
     require('./genres')(app);
+    require('./nodemailer.route')(app);
   }
 }
