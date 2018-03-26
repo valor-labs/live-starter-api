@@ -143,7 +143,7 @@ const usersSchema = new Schema({
   lastName: String,
   gender: String,
   role: {type: String, default: 'user'},
-  type: String,
+  type: {type: String, default: 'fan'},
   position: String,
   city: String,
   country: String,

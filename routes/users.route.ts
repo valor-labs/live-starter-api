@@ -1,12 +1,14 @@
 import { Request, Response, Express } from 'express';
 
-import { getUser, transformUsersToResponceObj } from '../servises/users.service';
+import { getUser, transformUsersToResponceObj, updateUser } from '../servises/users.service';
 import { UserResponse } from '../models/users';
 import { getEvent, transformEventToResponceObj } from '../servises/events.service';
+import { UpdateModel } from '../servises/update.interface';
 
 module.exports = (app: Express): void => {
   app.get('/get-artists-by-query', getArtistWithNextShow);
   app.get('/get-artists-amount', getArtistsAmount);
+  app.put('/update-user-profile', updateUserProfile);
 };
 
 interface UsersQueryObj {
@@ -90,4 +92,32 @@ async function getArtistWithNextShow(req: Request, res: Response): Promise<void 
     const status = 500;
     res.status(status).send(err);
   }
+}
+
+function updateUserProfile(req: Request, res: Response): void | undefined {
+  const body = req.body;
+  const updatedData = body.updatedData;
+
+  if (!body.id) {
+    const status = 500;
+    res.status(status).send({message: 'Unidentified user'});
+
+    return undefined;
+  }
+
+  const updateParams: UpdateModel = {
+    conditions: {_id: body.id},
+    doc: {
+      $set: updatedData
+    }
+  };
+
+  updateUser(updateParams)
+    .then(() => {
+      res.json({message: 'Your profile was successfully updated'});
+    })
+    .catch(err => {
+      const status = 500;
+      res.status(status).send(err);
+    });
 }
