@@ -1,14 +1,22 @@
 import { Request, Response, Express } from 'express';
 
-import { getUser, transformUsersToResponceObj, updateUser } from '../servises/users.service';
+import {
+  getUser, getUserNotificationsModel,
+  transformUsersToResponceObj,
+  updateUser,
+  updateUserNotificationsModel
+} from '../servises/users.service';
 import { UserResponse } from '../models/users';
 import { getEvent, transformEventToResponceObj } from '../servises/events.service';
 import { UpdateModel } from '../servises/update.interface';
+import { ObjectID } from 'bson';
 
 module.exports = (app: Express): void => {
   app.get('/get-artists-by-query', getArtistWithNextShow);
   app.get('/get-artists-amount', getArtistsAmount);
   app.put('/update-user-profile', updateUserProfile);
+  app.put('/update-user-notifications', updateUserNotifications);
+  app.get('/get-user-notifications', getUserNotifications);
 };
 
 interface UsersQueryObj {
@@ -16,7 +24,7 @@ interface UsersQueryObj {
   username?: RegExp;
   country?: string;
   type?: string;
-  genres?: {$in: string[]};
+  genres?: { $in: string[] };
 }
 
 interface UsersRequestQueryObj {
@@ -30,6 +38,35 @@ function getArtistsAmount(req: Request, res: Response): void {
   getUser({})
     .then(users => {
       res.json(users.length);
+    })
+    .catch(err => {
+      const status = 500;
+      res.status(status).send(err);
+    });
+}
+
+function getUserNotifications(req: Request, res: Response): void | undefined {
+  const query = req.query;
+
+  if (!query.userId) {
+    const status = 500;
+    res.status(status).send({message: 'Unidentified user'});
+
+    return undefined;
+  }
+
+  const searchParams = {
+    query: {userId: query.userId},
+    projection: {
+      _id: false,
+      userId: false,
+      __v: false
+    }
+  };
+
+  getUserNotificationsModel(searchParams)
+    .then(notifications => {
+      res.json(notifications);
     })
     .catch(err => {
       const status = 500;
@@ -115,6 +152,34 @@ function updateUserProfile(req: Request, res: Response): void | undefined {
   updateUser(updateParams)
     .then(() => {
       res.json({message: 'Your profile was successfully updated'});
+    })
+    .catch(err => {
+      const status = 500;
+      res.status(status).send(err);
+    });
+}
+
+function updateUserNotifications(req: Request, res: Response): void | undefined {
+  const body = req.body;
+  const updatedData = body.updatedData;
+
+  if (!body.id) {
+    const status = 500;
+    res.status(status).send({message: 'Unidentified user'});
+
+    return undefined;
+  }
+
+  const updateParams: UpdateModel = {
+    conditions: {userId: body.id},
+    doc: {
+      $set: updatedData
+    }
+  };
+
+  updateUserNotificationsModel(updateParams)
+    .then(() => {
+      res.json({message: 'Your Notifications was successfully updated'});
     })
     .catch(err => {
       const status = 500;
