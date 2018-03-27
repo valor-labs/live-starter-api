@@ -3,7 +3,13 @@ import { Request, Response, Express } from 'express';
 
 import { User, UserResponse } from '../models/users';
 import { getEvent, transformEventToResponceObj } from '../servises/events.service';
-import { createUser, getUser, transformUsersToResponceObj, updateUser } from '../servises/users.service';
+import {
+  createUser,
+  createUserNotification,
+  getUser,
+  transformUsersToResponceObj,
+  updateUser
+} from '../servises/users.service';
 import { UpdateModel } from '../servises/update.interface';
 
 module.exports = (app: Express): void => {
@@ -103,7 +109,7 @@ function editUserAvatar(req: Request, res: Response): void | undefined {
     });
 }
 
-function signUpUser(req: Request, res: Response): void | undefined {
+async function signUpUser(req: Request, res: Response): Promise<void> {
   const body = {
     ...req.body,
     ...{
@@ -125,14 +131,16 @@ function signUpUser(req: Request, res: Response): void | undefined {
   };
   delete body._id;
 
-  createUser(body)
-    .then(user => {
-      res.json(user);
-    })
-    .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
-    });
+  try {
+    const newUser = await createUser(body);
+    const newUsersNotification = await createUserNotification(newUser._id);
+
+    res.json(newUser);
+  } catch (error) {
+    const status = 500;
+    res.status(status).send(error);
+  }
+
 }
 
 function isEmailExist(req: Request, res: Response): void | undefined {
