@@ -3,6 +3,8 @@ import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import { Express } from 'express';
 
+// export const BACKEND_URL = 'http://localhost:3001';
+export const BACKEND_URL = 'https://livestarter-api.herokuapp.com';
 // export const CLIENT_URL = 'http://localhost:4200';
 export const CLIENT_URL = 'https://livestarter-c828d.firebaseapp.com';
 
