@@ -1,18 +1,33 @@
 /* tslint:disable:no-any */
-import { Request, Express } from 'express';
+import { Request, Express, Response, NextFunction } from 'express';
 import * as mongoose from 'mongoose';
 import * as fs from 'fs';
 import * as multer from 'multer';
 import * as uniqueString from 'unique-string';
 
+import { updateUser } from '../servises/users.service';
+import { updateEvent } from '../servises/events.service';
+import { UpdateModel } from '../servises/update.interface';
+import { BACKEND_URL } from '../config/express.config';
+
 const events = mongoose.model('Events');
 const upload = multer();
+
+interface SaveFileResponse {
+  isSuccess: boolean;
+  err?: Error;
+}
+
+interface MiddlewareResponse extends Response {
+  destroy: Function;
+}
 
 module.exports = (app: Express): void => {
   app.get('/api', (req, res) => {
     res.end('file catcher example');
   });
   app.post('/api', upload.array('file'), uploadPoster);
+  app.put('/upload-avatar', fileUploaderMiddleware,  uploadAvatar);
 };
 
 interface FileUploaderRequest extends Request {
@@ -25,41 +40,124 @@ interface FileUploaderRequest extends Request {
   }];
 }
 
-function uploadPoster(req: FileUploaderRequest, res: any) {
+async function uploadAvatar(req: Request, res: Response): Promise<void> {
+  const file = req.body.fileBody;
+  const headers = req.headers;
+  const filename = headers.filename || new Date().getTime().toString();
+  const pathName = `uploads/avatars/${filename}`;
+  const allowedMimeTypes = ['image/gif', 'image/jpeg', 'image/pjpeg', 'image/x-png', 'image/png', 'image/svg+xml'];
+
+  if (allowedMimeTypes.indexOf(headers['content-type']) === -1) {
+    const status = 500;
+
+    res.status(status).send({message: 'Unsupported type of file'});
+  }
+
+  const savedFile = await saveFile(`./${pathName}`, file);
+
+  if (!savedFile.isSuccess) {
+    const status = 500;
+
+    res.status(status).send(savedFile.err);
+  }
+
+  const newImageUrl = `${BACKEND_URL}/${pathName}`;
+
+  const updateParams: UpdateModel = {
+    conditions: {_id: headers.userid},
+    doc: {
+      $set: {avatar: newImageUrl}
+    }
+  };
+
+  await updateUser(updateParams);
+
+  res.json({
+    message: 'Avatar was updating',
+    imageUrl: newImageUrl
+  });
+}
+
+async function uploadPoster(req: FileUploaderRequest, res: Response): Promise<void> {
   const files = req.files;
   const body = req.body;
   const allowedMimeTypes = ['image/gif', 'image/jpeg', 'image/pjpeg', 'image/x-png', 'image/png', 'image/svg+xml'];
 
   if (!files.length) {
-    return res.json({success: false, data: null, error: 'Field is required'});
+    const status = 500;
+
+    res.status(status).send({message: 'Field is required'});
   }
 
   files.forEach(file => {
     if (allowedMimeTypes.indexOf(file.mimetype) === -1) {
-      return res.json({success: false, data: null, error: 'Unsupported type of file'});
+      const status = 500;
+
+      res.status(status).send({message: 'Unsupported type of file'});
     }
+
     const uniqName = `${uniqueString()}_${file.originalname}`;
+    const pathName = `uploads/posters/${uniqName}`;
 
-    fs.writeFile(`./uploads/posters/${uniqName}`, file.buffer, (err: Error) => {
-      if (err) {
-        return res.json({success: !err, data: null, err});
-      }
+    saveFile(`./${pathName}`, file.buffer)
+      .then(savedFile => {
+        if (!savedFile.isSuccess) {
+          const status = 500;
 
-      return events
-        .update(
-          {_id: body.eventId},
-          {
-            $push: {
-              posters: uniqName
-            }
-          })
-        .exec((error: Error) => {
-          if (error) {
-            return res.json({success: !error, data: null, error});
+          res.status(status).send(savedFile.err);
+        }
+
+        const updateParams: UpdateModel = {
+          conditions: {_id: body.eventId},
+          doc: {
+            $push: {posters: uniqName}
           }
+        };
 
-          return res.json({success: error, data: 'success'});
-        });
+        updateEvent(updateParams)
+          .then(() => {
+            return res.json({success: true, data: 'success'});
+          });
+      })
+      .catch(err => {
+        const status = 500;
+        res.status(status).send({message: err});
+      });
+  });
+}
+
+function saveFile(fileName: string, buffer: Buffer | string): Promise<SaveFileResponse> {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(fileName, buffer, (err: Error) => {
+      const result = {
+        isSuccess: true,
+        err: undefined
+      };
+
+      if (err) {
+        result.isSuccess = false;
+        result.err = err;
+      }
+      result.isSuccess = true;
+
+      resolve(result);
     });
+  });
+}
+
+function fileUploaderMiddleware(req: Request, res: MiddlewareResponse, next: NextFunction) {
+  const chunks: Buffer[] = [];
+
+  req.on('end', () => {
+    req.body.fileBody = Buffer.concat(chunks);
+    next();
+  });
+
+  req.on('data', (chunk: Buffer) => {
+    chunks.push(chunk);
+  });
+
+  req.on('error', (err: Error) => {
+    res.destroy(err);
   });
 }
