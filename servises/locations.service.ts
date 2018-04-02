@@ -17,7 +17,8 @@ export function getCountries(): Promise<Country[]> {
 export function getCities(country: string): Promise<City[]> {
 
   return citiesDB
-    .find({country}, {_id: false})
+    .find({country}, {_id: false, __v: false})
+    .sort({name: 1})
     .lean(true)
     .exec();
 }

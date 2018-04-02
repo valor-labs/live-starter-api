@@ -9,7 +9,6 @@ import {
 import { UserResponse } from '../models/users';
 import { getEvent, transformEventToResponceObj } from '../servises/events.service';
 import { UpdateModel } from '../servises/update.interface';
-import { ObjectID } from 'bson';
 import { HttpStatus } from '../enums/http-status';
 
 module.exports = (app: Express): void => {

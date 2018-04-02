@@ -38,6 +38,7 @@ export interface UserResponse {
   username: string;
   firstName: string;
   lastName: string;
+  dateOfBirth: Date;
   gender: string;
   role: string;
   type: string;
@@ -48,6 +49,18 @@ export interface UserResponse {
   website: string;
   joinDate?: Date;
   biography: string;
+  location: {
+    country: {
+      name: string;
+      sortname: string;
+    }
+    city: {
+      name: string;
+      country: string;
+      lat: string;
+      lng: string;
+    }
+  };
   contacts: {
     phone: string;
     skype: string;
@@ -90,6 +103,7 @@ export interface User extends mongoose.Document {
   username: string;
   firstName: string;
   lastName: string;
+  dateOfBirth: Date;
   gender: string;
   role: string;
   type: string;
@@ -100,6 +114,18 @@ export interface User extends mongoose.Document {
   website: string;
   joinDate: Date;
   biography: string;
+  location: {
+    country: {
+      name: string;
+      sortname: string;
+    }
+    city: {
+      name: string;
+      country: string;
+      lat: string;
+      lng: string;
+    }
+  };
   contacts: {
     phone: string;
     skype: string;
@@ -113,6 +139,7 @@ export interface User extends mongoose.Document {
     google: string;
     facebook: string;
     twitter: string;
+    instagram: string;
   };
   statistics?: {
     likes: {
@@ -135,12 +162,13 @@ export interface User extends mongoose.Document {
 }
 
 const usersSchema = new Schema({
-  active: Boolean,
-  avatar: String,
+  active: {type: Boolean, default: true},
+  avatar: {type: String, default: ''},
   email: {type: String, unique: true},
   username: String,
   firstName: String,
   lastName: String,
+  dateOfBirth: Date,
   gender: String,
   role: {type: String, default: 'user'},
   type: {type: String, default: 'fan'},
@@ -148,22 +176,35 @@ const usersSchema = new Schema({
   city: String,
   country: String,
   groupName: String,
-  website: String,
+  website: {type: String, default: ''},
   joinDate: String,
-  biography: String,
+  biography: {type: String, default: ''},
+  location: {
+    country: {
+      name: {type: String, default: ''},
+      sortname: {type: String, default: ''}
+    },
+    city: {
+      name: {type: String, default: ''},
+      country: {type: String, default: ''},
+      lat: {type: String, default: ''},
+      lng: {type: String, default: ''}
+    }
+  },
   contacts: {
-    phone: String,
-    skype: String,
-    hangouts: String
+    phone: {type: String, default: ''},
+    skype: {type: String, default: ''},
+    hangouts: {type: String, default: ''}
   },
   shows: {
     owned: [String],
     purchased: [String]
   },
   socials: {
-    google: String,
-    facebook: String,
-    twitter: String
+    google: {type: String, default: ''},
+    facebook: {type: String, default: ''},
+    twitter: {type: String, default: ''},
+    instagram: {type: String, default: ''}
   },
   statistics: {
     likes: {
