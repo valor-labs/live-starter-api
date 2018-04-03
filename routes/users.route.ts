@@ -10,6 +10,7 @@ import { UserResponse } from '../models/users';
 import { getEvent, transformEventToResponceObj } from '../servises/events.service';
 import { UpdateModel } from '../servises/update.interface';
 import { ObjectID } from 'bson';
+import { HttpStatus } from '../enums/http-status';
 
 module.exports = (app: Express): void => {
   app.get('/get-artists-by-query', getArtistWithNextShow);
@@ -40,8 +41,7 @@ function getArtistsAmount(req: Request, res: Response): void {
       res.json(users.length);
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }
 
@@ -49,8 +49,7 @@ function getUserNotifications(req: Request, res: Response): void | undefined {
   const query = req.query;
 
   if (!query.userId) {
-    const status = 500;
-    res.status(status).send({message: 'Unidentified user'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Unidentified user'});
 
     return undefined;
   }
@@ -69,8 +68,7 @@ function getUserNotifications(req: Request, res: Response): void | undefined {
       res.json(notifications);
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }
 
@@ -126,8 +124,7 @@ async function getArtistWithNextShow(req: Request, res: Response): Promise<void 
     res.json(respObj);
 
   } catch (err) {
-    const status = 500;
-    res.status(status).send(err);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
   }
 }
 
@@ -136,8 +133,7 @@ function updateUserProfile(req: Request, res: Response): void | undefined {
   const updatedData = body.updatedData;
 
   if (!body.id) {
-    const status = 500;
-    res.status(status).send({message: 'Unidentified user'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Unidentified user'});
 
     return undefined;
   }
@@ -154,8 +150,7 @@ function updateUserProfile(req: Request, res: Response): void | undefined {
       res.json({message: 'Your profile was successfully updated'});
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }
 
@@ -164,8 +159,7 @@ function updateUserNotifications(req: Request, res: Response): void | undefined 
   const updatedData = body.updatedData;
 
   if (!body.id) {
-    const status = 500;
-    res.status(status).send({message: 'Unidentified user'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Unidentified user'});
 
     return undefined;
   }
@@ -182,7 +176,6 @@ function updateUserNotifications(req: Request, res: Response): void | undefined 
       res.json({message: 'Your Notifications was successfully updated'});
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }

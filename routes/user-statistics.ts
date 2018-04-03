@@ -6,6 +6,7 @@ import { Request, Express, Response } from 'express';
 import { User } from '../models/users';
 import { Event } from '../models/events';
 import { LikingResponse } from '../models/likingResponse.interface';
+import { HttpStatus } from '../enums/http-status';
 
 const users = mongoose.model('Users');
 const events = mongoose.model('Events');
@@ -138,8 +139,8 @@ async function likeShow(req: Request, res: Response): Promise<void> {
   const body = req.body;
 
   if (!body.liker || !body.likee) {
-    const status = 500;
-    res.status(status).send({message: 'liker or likee are empty. Update without thats prohibited.'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .send({message: 'liker or likee are empty. Update without thats prohibited.'});
   }
 
   try {
@@ -150,8 +151,7 @@ async function likeShow(req: Request, res: Response): Promise<void> {
         res.json(respObj);
       });
   } catch (error) {
-    const status = 500;
-    res.status(status).send(error);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
 }
 
@@ -159,8 +159,8 @@ async function likeUser(req: Request, res: Response): Promise<void> {
   const body = req.body;
 
   if (!body.liker || !body.likee) {
-    const status = 500;
-    res.status(status).send({message: 'liker or likee are empty. Update without thats prohibited.'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .send({message: 'liker or likee are empty. Update without thats prohibited.'});
   }
 
   try {
@@ -171,7 +171,6 @@ async function likeUser(req: Request, res: Response): Promise<void> {
         res.json(respObj);
       });
   } catch (error) {
-    const status = 500;
-    res.status(status).send(error);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
 }

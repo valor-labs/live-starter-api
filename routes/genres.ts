@@ -2,6 +2,7 @@ import { Express, Request, Response } from 'express';
 
 import { getGenresFromDB } from '../servises/genres.service';
 import { authCheck } from './auth.route';
+import { HttpStatus } from '../enums/http-status';
 
 module.exports = (app: Express): void => {
   app.get('/get-genres', getGenres);
@@ -13,7 +14,6 @@ function getGenres(req: Request, res: Response): void {
       res.json(result[0].genres);
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }

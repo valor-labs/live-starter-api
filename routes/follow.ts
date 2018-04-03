@@ -4,6 +4,7 @@ import * as mongoose from 'mongoose';
 import { Request, Express, Response } from 'express';
 
 import { User } from '../models/users';
+import { HttpStatus } from '../enums/http-status';
 
 const users = mongoose.model('Users');
 
@@ -21,8 +22,8 @@ async function followUser(req: Request, res: Response): Promise<void | undefined
   const body = req.body;
 
   if (!body.follower || !body.following) {
-    const status = 500;
-    res.status(status).send({message: 'follower or followed are absent. Update without thats prohibited.'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .send({message: 'follower or followed are absent. Update without thats prohibited.'});
 
     return undefined;
   }
@@ -34,8 +35,7 @@ async function followUser(req: Request, res: Response): Promise<void | undefined
         res.json(result);
       });
   } catch (error) {
-    const status = 500;
-    res.status(status).send(error);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
 }
 
@@ -72,8 +72,7 @@ function checkFollowed(req: Request, res: Response): void | undefined {
   const body = req.body;
 
   if (!body.follower || !body.following) {
-    const status = 500;
-    res.status(status).send({message: 'follower or followed are absent'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'follower or followed are absent'});
 
     return undefined;
   }
@@ -86,7 +85,6 @@ function checkFollowed(req: Request, res: Response): void | undefined {
       res.json({isFollowed});
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send({message: err});
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
     });
 }

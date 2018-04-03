@@ -9,6 +9,7 @@ import { updateUser } from '../servises/users.service';
 import { updateEvent } from '../servises/events.service';
 import { UpdateModel } from '../servises/update.interface';
 import { BACKEND_URL } from '../config/express.config';
+import { HttpStatus } from '../enums/http-status';
 
 const events = mongoose.model('Events');
 const upload = multer();
@@ -48,17 +49,13 @@ async function uploadAvatar(req: Request, res: Response): Promise<void> {
   const allowedMimeTypes = ['image/gif', 'image/jpeg', 'image/pjpeg', 'image/x-png', 'image/png', 'image/svg+xml'];
 
   if (allowedMimeTypes.indexOf(headers['content-type']) === -1) {
-    const status = 500;
-
-    res.status(status).send({message: 'Unsupported type of file'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Unsupported type of file'});
   }
 
   const savedFile = await saveFile(`./${pathName}`, file);
 
   if (!savedFile.isSuccess) {
-    const status = 500;
-
-    res.status(status).send(savedFile.err);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(savedFile.err);
   }
 
   const newImageUrl = `${BACKEND_URL}/${pathName}`;
@@ -84,16 +81,12 @@ async function uploadPoster(req: FileUploaderRequest, res: Response): Promise<vo
   const allowedMimeTypes = ['image/gif', 'image/jpeg', 'image/pjpeg', 'image/x-png', 'image/png', 'image/svg+xml'];
 
   if (!files.length) {
-    const status = 500;
-
-    res.status(status).send({message: 'Field is required'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Field is required'});
   }
 
   files.forEach(file => {
     if (allowedMimeTypes.indexOf(file.mimetype) === -1) {
-      const status = 500;
-
-      res.status(status).send({message: 'Unsupported type of file'});
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Unsupported type of file'});
     }
 
     const uniqName = `${uniqueString()}_${file.originalname}`;
@@ -102,9 +95,7 @@ async function uploadPoster(req: FileUploaderRequest, res: Response): Promise<vo
     saveFile(`./${pathName}`, file.buffer)
       .then(savedFile => {
         if (!savedFile.isSuccess) {
-          const status = 500;
-
-          res.status(status).send(savedFile.err);
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(savedFile.err);
         }
 
         const updateParams: UpdateModel = {
@@ -120,8 +111,7 @@ async function uploadPoster(req: FileUploaderRequest, res: Response): Promise<vo
           });
       })
       .catch(err => {
-        const status = 500;
-        res.status(status).send({message: err});
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
       });
   });
 }
