@@ -7,19 +7,17 @@ import { Schema } from 'mongoose';
  */
 
 export interface City extends mongoose.Document {
-  city: string;
+  name: string;
   country: string;
-  lat: number;
-  lng: number;
-  alias: number;
+  lat: string;
+  lng: string;
 }
 
-export const citiesSchema = new Schema({
-  city: String,
-  country: {type: Schema.Types.ObjectId, ref: 'Countries'},
-  lat: Number,
-  lng: Number,
-  alias: String
+export const citySchema = new Schema({
+  name: String,
+  country: String,
+  lat: String,
+  lng: String
 });
 
-export default mongoose.model('Cities', citiesSchema);
+export default mongoose.model('Cities', citySchema);
