@@ -1,6 +1,7 @@
 import { Express, Request, Response } from 'express';
 
 import { getCities, getCountries } from '../servises/locations.service';
+import { HttpStatus } from '../enums/http-status';
 
 module.exports = (app: Express): void => {
   app.get('/signup/get-locations', getFullLocations);
@@ -19,8 +20,7 @@ async function getFullLocations(req: Request, res: Response) {
 
     res.json(respObj);
   } catch (err) {
-    const status = 500;
-    res.status(status).send(err);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
   }
 }
 
@@ -30,7 +30,6 @@ function getLocations(req: Request, res: Response) {
       res.json({countries});
     })
     .catch (err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }

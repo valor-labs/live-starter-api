@@ -7,6 +7,7 @@ import { ObjectID } from 'bson';
 import { updateUser } from '../servises/users.service';
 import { getEvent, transformEventToResponceObj, updateEvent } from '../servises/events.service';
 import { UpdateModel } from '../servises/update.interface';
+import { HttpStatus } from '../enums/http-status';
 
 const events = mongoose.model('Events');
 
@@ -39,8 +40,7 @@ function getNonLiveEventsAmountData(req: Request, res: Response): void {
         res.json(data);
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send({message: err});
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
     });
 }
 
@@ -95,15 +95,13 @@ async function getEventsDataByQuery(req: Request, res: Response): Promise<void> 
     const list = await getEvent({query: commonQuery, limit});
     res.json(transformEventToResponceObj(list, query.userId));
   } catch (err) {
-    const status = 500;
-    res.status(status).send({message: err});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
   }
 }
 
 async function saveNewEvent(req: Request, res: Response): Promise<void | undefined> {
   if (!req.body) {
-    const status = 500;
-    res.status(status).send({message: 'Failed, eventId or userId is empty'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Failed, eventId or userId is empty'});
 
     return undefined;
   }
@@ -131,8 +129,7 @@ async function saveNewEvent(req: Request, res: Response): Promise<void | undefin
     res.json({message: 'user saved', newId: newEvent._id});
 
   } catch (err) {
-    const status = 500;
-    res.status(status).send({message: err});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
   }
 }
 
@@ -140,8 +137,7 @@ async function getFreeTicket(req: Request, res: Response): Promise<void | undefi
   const query = req.query;
 
   if (!query.eventId && !query.userId) {
-    const status = 500;
-    res.status(status).send({message: 'Failed, eventId or userId is empty'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Failed, eventId or userId is empty'});
 
     return undefined;
   }
@@ -178,7 +174,6 @@ async function getFreeTicket(req: Request, res: Response): Promise<void | undefi
 
     res.json({message: 'You have succsefully purchased the ticket', isAlreadyExist: false});
   } catch (err) {
-    const status = 500;
-    res.status(status).send({message: err});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
   }
 }

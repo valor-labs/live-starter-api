@@ -11,6 +11,7 @@ import {
   updateUser
 } from '../servises/users.service';
 import { UpdateModel } from '../servises/update.interface';
+import { HttpStatus } from '../enums/http-status';
 
 module.exports = (app: Express): void => {
   app.get('/edit-profile/get-user-data', getUserData);
@@ -36,8 +37,7 @@ function getUserData(req: Request, res: Response): void | undefined {
   const query: GetUserDataInterface = req.query;
 
   if (!query.email && !query._id) {
-    const status = 500;
-    res.status(status).send({message: 'user email or user id is empty'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'user email or user id is empty'});
 
     return undefined;
   }
@@ -47,8 +47,7 @@ function getUserData(req: Request, res: Response): void | undefined {
       const responseObj = transformUsersToResponceObj(user)[0];
       res.json(responseObj);
     }).catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
   });
 }
 
@@ -57,8 +56,7 @@ function editUser(req: Request, res: Response): void | undefined {
   const userUpdateSet = body.userUpdateSet;
 
   if (!body.email) {
-    const status = 500;
-    res.status(status).send({message: 'user email is empty'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'user email is empty'});
 
     return undefined;
   }
@@ -75,8 +73,7 @@ function editUser(req: Request, res: Response): void | undefined {
       res.json({message: 'user updated'});
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }
 
@@ -84,8 +81,7 @@ function editUserAvatar(req: Request, res: Response): void | undefined {
   const body: EditUserAvatarInterface = req.body;
 
   if (!body.email) {
-    const status = 500;
-    res.status(status).send({message: 'user email is empty'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'user email is empty'});
 
     return undefined;
   }
@@ -104,8 +100,7 @@ function editUserAvatar(req: Request, res: Response): void | undefined {
       res.json({message: 'user updated'});
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }
 
@@ -137,8 +132,7 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 
     res.json(newUser);
   } catch (error) {
-    const status = 500;
-    res.status(status).send(error);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
 
 }
@@ -147,8 +141,7 @@ function isEmailExist(req: Request, res: Response): void | undefined {
   const body: GetUserDataInterface = req.body;
 
   if (!body.email) {
-    const status = 500;
-    res.status(status).send({message: 'Data invalid. Please check required fields'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Data invalid. Please check required fields'});
 
     return undefined;
   }
@@ -163,8 +156,7 @@ function isEmailExist(req: Request, res: Response): void | undefined {
       res.json(respObj);
     })
     .catch(err => {
-      const status = 500;
-      res.status(status).send(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
     });
 }
 
@@ -172,8 +164,8 @@ async function getUserFollowings(req: Request, res: Response): Promise<void | un
   const query = req.query;
 
   if (!query.follower) {
-    const status = 500;
-    res.status(status).send({message: 'follower id is empty. Update without thats prohibited.'});
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .send({message: 'follower id is empty. Update without thats prohibited.'});
 
     return undefined;
   }
@@ -200,7 +192,6 @@ async function getUserFollowings(req: Request, res: Response): Promise<void | un
 
     res.json(responseObj);
   } catch (err) {
-    const status = 500;
-    res.status(status).send(err);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
   }
 }

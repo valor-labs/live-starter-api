@@ -2,6 +2,7 @@ import { Express, Request, Response } from 'express';
 
 import { NodeMailer } from '../servises/nodemailer.service';
 import { SentMessageInfo } from 'nodemailer';
+import { HttpStatus } from '../enums/http-status';
 
 module.exports = (app: Express): void => {
   app.post('/callback-form', sendCallback);
@@ -18,8 +19,7 @@ function sendCallback(req: Request, res: Response): void | undefined {
   const body: CallbackData = req.body;
 
   if (!body.fullname || !body.fullname.length || !body.email || !body.type || !body.message || !body.message.length) {
-    const status = 500;
-    res.status(status).send({
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
       title: 'Error',
       message: `Email didn't send! Invalid data, please try again`
     });
@@ -31,8 +31,7 @@ function sendCallback(req: Request, res: Response): void | undefined {
 
   mailer.sendCallbackMessage(body, (err: Error, info: SentMessageInfo) => {
     if (err) {
-      const status = 500;
-      res.status(status).send({
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
         title: 'Error',
         message: `Email didn't send! Please try again`
       });
