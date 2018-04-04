@@ -9,14 +9,15 @@ const citiesDB = mongoose.model('Cities');
 
 export function getCountries(): Promise<Country[]> {
   return countriesDB
-    .find({})
+    .find({}, {_id: false, id: false})
     .lean(true)
     .exec();
 }
 
-export function getCities(): Promise<City[]> {
+export function getCities(country: string): Promise<City[]> {
+
   return citiesDB
-    .find({})
+    .find({country}, {_id: false})
     .lean(true)
     .exec();
 }
