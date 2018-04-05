@@ -1,8 +1,8 @@
 /* tslint:disable:no-any */
 import * as mongoose from 'mongoose';
 
-import { Country } from '../models/countries';
-import { City } from '../models/cities';
+import { Country } from '../models/countries.model';
+import { City } from '../models/cities.model';
 
 const countriesDB = mongoose.model('Countries');
 const citiesDB = mongoose.model('Cities');
