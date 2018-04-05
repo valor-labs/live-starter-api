@@ -1,6 +1,6 @@
-import './cities';
+import './cities.model';
 import './users';
-import './countries';
+import './countries.model';
 import './faqs';
 import './genres';
 import './events';
