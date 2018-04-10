@@ -3,7 +3,7 @@
 import * as mongoose from 'mongoose';
 import { Query } from 'mongoose';
 
-import { Event, EventResponse } from '../models/events';
+import { Event, EventResponse } from '../models/events.model';
 import { UpdateModel } from './update.interface';
 
 const eventsModel = mongoose.model('Events');

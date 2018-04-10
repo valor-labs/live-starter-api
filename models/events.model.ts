@@ -8,6 +8,11 @@ import { Schema } from 'mongoose';
  @property {String} genre - genres of a music
  */
 
+export interface LinkWithEmbedCode {
+  link: string;
+  embedCode: string;
+}
+
 export interface EventResponse {
   name: string;
   creator: string;
@@ -16,8 +21,8 @@ export interface EventResponse {
   info: string;
   genres: string[];
   posters: string[];
-  audios: string[];
-  videos: string[];
+  audios: LinkWithEmbedCode[];
+  videos: LinkWithEmbedCode[];
   buyers: number;
   live: boolean;
   completed: boolean;
@@ -58,8 +63,8 @@ export interface Event extends mongoose.Document {
     info: string;
     genres: string[];
     posters: string[];
-    audios: string[];
-    videos: string[];
+    audios: LinkWithEmbedCode[];
+    videos: LinkWithEmbedCode[];
     buyers: {[key: string]: any}[];
     appreciations: string[];
     live: boolean;
@@ -98,8 +103,18 @@ export const eventsSchema = new Schema({
     artist: String,
     genres: [String],
     posters: [String],
-    audios: [String],
-    videos: [String],
+    audios: [
+      {
+        link: String,
+        embedCode: String
+      }
+    ],
+    videos: [
+      {
+        link: String,
+        embedCode: String
+      }
+    ],
     buyers: [{
       userId: String,
       isFree: Boolean

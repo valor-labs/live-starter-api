@@ -4,7 +4,7 @@ import * as mongoose from 'mongoose';
 import { Request, Express, Response } from 'express';
 
 import { User } from '../models/users';
-import { Event } from '../models/events';
+import { Event } from '../models/events.model';
 import { LikingResponse } from '../models/likingResponse.interface';
 import { HttpStatus } from '../enums/http-status';
 
