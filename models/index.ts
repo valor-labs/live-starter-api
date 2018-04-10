@@ -3,5 +3,5 @@ import './users';
 import './countries.model';
 import './faqs';
 import './genres';
-import './events';
+import './events.model';
 import './userNotifications';
