@@ -18,6 +18,7 @@ interface CommonQuery {
   buyers?: string;
   genre?: {$in: string[]};
   genres?: {$in: string[]};
+  hashtags?: {$in: string[]};
   datePerformance?: {$gt: Date, $lt?: Date};
   showLocation?: string;
 }
@@ -51,6 +52,11 @@ async function getEventsDataByQuery(req: Request, res: Response): Promise<void> 
 
   if (query.genres) {
     commonQuery.genres = {$in: query.genres.split(',')};
+  }
+
+  if (query.hashtags) {
+    query.hashtags = decodeURIComponent(query.hashtags);
+    commonQuery.hashtags = {$in: query.hashtags.split(',')};
   }
 
   if (query.exceptById) {
