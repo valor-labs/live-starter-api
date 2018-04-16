@@ -21,6 +21,7 @@ export interface EventResponse {
   info: string;
   genres: string[];
   posters: string[];
+  hashtags: string[];
   audios: LinkWithEmbedCode[];
   videos: LinkWithEmbedCode[];
   buyers: number;
@@ -63,6 +64,7 @@ export interface Event extends mongoose.Document {
     info: string;
     genres: string[];
     posters: string[];
+    hashtags: string[];
     audios: LinkWithEmbedCode[];
     videos: LinkWithEmbedCode[];
     buyers: {[key: string]: any}[];
@@ -103,6 +105,7 @@ export const eventsSchema = new Schema({
     artist: String,
     genres: [String],
     posters: [String],
+    hashtags: [String],
     audios: [
       {
         link: String,
