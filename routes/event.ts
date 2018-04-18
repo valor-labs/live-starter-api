@@ -12,15 +12,16 @@ import { HttpStatus } from '../enums/http-status';
 const events = mongoose.model('Events');
 
 interface CommonQuery {
-  showName?: {$ne: string};
-  creator?: {$ne: string};
-  _id?: ObjectID | {$ne: ObjectID};
+  showName?: { $ne: string };
+  creator?: { $ne: ObjectID };
+  _id?: ObjectID | { $ne: ObjectID };
   buyers?: string;
-  genre?: {$in: string[]};
-  genres?: {$in: string[]};
-  hashtags?: {$in: string[]};
-  datePerformance?: {$gt: Date, $lt?: Date};
+  genre?: { $in: string[] };
+  genres?: { $in: string[] };
+  hashtags?: { $in: string[] };
+  datePerformance?: { $gt: Date, $lt?: Date };
   showLocation?: string;
+  completed?: boolean;
 }
 
 module.exports = (app: Express): void => {
@@ -37,9 +38,7 @@ function getNonLiveEventsAmountData(req: Request, res: Response): void {
     .count()
     .lean(true)
     .exec()
-    .then(data => {
-        res.json(data);
-    })
+    .then(data => res.json(data))
     .catch(err => {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
     });
@@ -67,9 +66,12 @@ async function getEventsDataByQuery(req: Request, res: Response): Promise<void> 
     commonQuery.datePerformance = {$gt: new Date(query.minDate)};
   }
 
-  if (query.exceptByName && query.exceptByCreator) {
+  if (query.exceptByName) {
     commonQuery.showName = {$ne: query.exceptByName};
-    commonQuery.creator = {$ne: query.exceptByName};
+  }
+
+  if (query.exceptByCreator) {
+    commonQuery.creator = {$ne: new ObjectID(query.exceptByCreator)};
   }
 
   if (query.findById) {
@@ -95,6 +97,10 @@ async function getEventsDataByQuery(req: Request, res: Response): Promise<void> 
 
   if (query.findByLocation) {
     commonQuery.showLocation = query.findByLocation;
+  }
+
+  if (query.findByCompleted) {
+    commonQuery.completed = query.findByCompleted === `${true}`;
   }
 
   try {
@@ -152,7 +158,7 @@ async function getFreeTicket(req: Request, res: Response): Promise<void | undefi
     const getEvtParams = {
       query: {
         _id: query.eventId,
-       'buyers.userId': query.userId
+        'buyers.userId': query.userId
       }
     };
 
