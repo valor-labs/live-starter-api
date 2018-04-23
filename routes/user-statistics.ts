@@ -145,11 +145,8 @@ async function likeShow(req: Request, res: Response): Promise<void> {
 
   try {
     await updateLiker(body, true);
-
-    await updateShow(body)
-      .then(respObj => {
-        res.json(respObj);
-      });
+    const respObj = await updateShow(body);
+    res.json(respObj);
   } catch (error) {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
@@ -165,11 +162,8 @@ async function likeUser(req: Request, res: Response): Promise<void> {
 
   try {
     await updateLiker(body, false);
-
-    await updateLiker(body, false, true)
-      .then((respObj: LikingResponse) => {
-        res.json(respObj);
-      });
+    const respObj = await updateLiker(body, false, true);
+    res.json(respObj);
   } catch (error) {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
