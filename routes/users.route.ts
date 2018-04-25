@@ -13,7 +13,7 @@ import { HttpStatus } from '../enums/http-status';
 
 module.exports = (app: Express): void => {
   app.get('/get-artists-by-query', getArtistWithNextShow);
-  app.get('/get-artists-amount', getArtistsAmount);
+  app.get('/get-users-amount', getUsersAmount);
   app.put('/update-user-profile', updateUserProfile);
   app.put('/update-user-notifications', updateUserNotifications);
   app.get('/get-user-notifications', getUserNotifications);
@@ -34,8 +34,10 @@ interface UsersRequestQueryObj {
   findByGenre?: string;
 }
 
-function getArtistsAmount(req: Request, res: Response): void {
-  getUser({})
+function getUsersAmount(req: Request, res: Response): void {
+  const query = req.query;
+
+  getUser({query})
     .then(users => {
       res.json(users.length);
     })
