@@ -25,23 +25,22 @@ interface CommonQuery {
 }
 
 module.exports = (app: Express): void => {
-  app.get('/get-non-live-events-amount', getNonLiveEventsAmountData);
+  app.get('/get-events-amount', getEventsAmountData);
   app.get('/get-events-list-by-query', getEventsDataByQuery);
   app.get('/get-my-events', getEventsDataByQuery);
   app.get('/get-free-ticket', getFreeTicket);
   app.post('/save-event', saveNewEvent);
 };
 
-function getNonLiveEventsAmountData(req: Request, res: Response): void {
-  events
-    .find({live: false}, {buyers: false})
-    .count()
-    .lean(true)
-    .exec()
-    .then(data => res.json(data))
-    .catch(err => {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
-    });
+async function getEventsAmountData(req: Request, res: Response): Promise<void> {
+  const query = req.query;
+
+  try {
+    const list = await getEvent({query: {live: query.isLive, completed: false}});
+    res.json(list.length);
+  } catch (err) {
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
+  }
 }
 
 async function getEventsDataByQuery(req: Request, res: Response): Promise<void> {
