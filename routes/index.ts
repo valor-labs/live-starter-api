@@ -14,5 +14,6 @@ export class Routes {
     require('./location.route')(app);
     require('./genres')(app);
     require('./nodemailer.route')(app);
+    require('./comments.route')(app);
   }
 }
