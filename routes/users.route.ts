@@ -13,6 +13,7 @@ import { HttpStatus } from '../enums/http-status';
 
 module.exports = (app: Express): void => {
   app.get('/get-artists-by-query', getArtistWithNextShow);
+  app.get('/get-users-by-query', getUsersByQuery);
   app.get('/get-users-amount', getUsersAmount);
   app.put('/update-user-profile', updateUserProfile);
   app.put('/update-user-notifications', updateUserNotifications);
@@ -21,6 +22,7 @@ module.exports = (app: Express): void => {
 
 interface UsersQueryObj {
   active: boolean;
+  withNextShow?: boolean;
   username?: RegExp;
   country?: string;
   type?: string;
@@ -29,6 +31,7 @@ interface UsersQueryObj {
 
 interface UsersRequestQueryObj {
   findByName?: string;
+  withNextShow?: boolean;
   findByLocation?: string;
   type?: string;
   findByGenre?: string;
@@ -91,6 +94,48 @@ function parseQuery(query: UsersRequestQueryObj): UsersQueryObj {
   }
 
   return usersQueryObj;
+}
+
+async function getUsersByQuery(req: Request, res: Response): Promise<void | undefined> {
+  const query = req.query;
+  const usersQueryObj: UsersQueryObj = parseQuery(query);
+  const limit = query && query.limit ? Number(query.limit) : undefined;
+
+  try {
+    const users = await getUser({query: usersQueryObj, limit});
+    const tranformedUser: UserResponse[] = transformUsersToResponceObj(users);
+
+    if (!query || !query.withNextShow) {
+      res.json(tranformedUser);
+    }
+
+    const eventParams = {
+      query: {
+        datePerformance: {$gt: new Date()}
+      },
+      sort: { datePerformance: 1, creator: -1}
+    };
+
+    const events = await getEvent(eventParams);
+
+    const respObj = tranformedUser.map(user => {
+      const userShows = events.filter(event => {
+        return event.creator === user._id.toString();
+      });
+
+      const tranformedShow = userShows.length ? transformEventToResponceObj([userShows[0]])[0] : null;
+
+      return {
+        user,
+        show: tranformedShow
+      };
+    });
+
+    res.json(respObj);
+
+  } catch (err) {
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+  }
 }
 
 async function getArtistWithNextShow(req: Request, res: Response): Promise<void | undefined> {
