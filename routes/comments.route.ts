@@ -33,7 +33,8 @@ async function getComments(req: Request, res: Response): Promise<void> {
     projection: {
       __v: false,
       commentedUser: false
-    }
+    },
+    sort: { dateCreated: -1 }
   };
 
   try {

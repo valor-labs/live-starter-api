@@ -11,6 +11,7 @@ export function getCommentsFromDB(params: {[key: string]: any}): Promise<Comment
 
   return comment
     .find(params.query, projection)
+    .sort(params.sort)
     .populate({path: 'commentator', select: {avatar: true, username: true, type: true}})
     .lean(true)
     .limit(params.limit)
