@@ -43,8 +43,9 @@ async function getTips(req: Request, res: Response): Promise<void> {
     },
     projection: {
       __v: false,
-      addresser: false
-    }
+      addressee: false
+    },
+    sort: { date: -1 }
   };
 
   try {

@@ -4,7 +4,7 @@ import { City } from './cities.model';
 import { Country } from './countries.model';
 
 export interface TipsResponse {
-  addressee: {
+  addresser: {
     avatar: string;
     username: string;
     type: string;
