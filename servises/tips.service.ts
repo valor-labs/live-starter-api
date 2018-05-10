@@ -12,7 +12,7 @@ export function getTipsFromDB(params: {[key: string]: any}): Promise<TipsRespons
   return tip
     .find(params.query, projection)
     .sort(params.sort)
-    .populate({path: 'addressee', select: {avatar: true, username: true, type: true, location: true}})
+    .populate({path: 'addresser', select: {avatar: true, username: true, type: true, location: true}})
     .lean(true)
     .limit(params.limit)
     .exec();
@@ -28,7 +28,7 @@ export async function addTipToDB(data: Tips): Promise<TipsResponse> {
     },
     projection: {
       __v: false,
-      addresser: false
+      addressee: false
     },
     limit: 1
   };
