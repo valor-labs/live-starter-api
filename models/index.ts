@@ -6,3 +6,4 @@ import './genres';
 import './events.model';
 import './userNotifications';
 import './comments.model';
+import './tips.model';
