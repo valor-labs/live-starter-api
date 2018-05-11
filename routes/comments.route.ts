@@ -10,6 +10,11 @@ module.exports = (app: Express): void => {
   app.get('/get-comments', getComments);
 };
 
+interface GetCommentsQuery {
+  commentedUser?: string;
+  commentator?: string;
+}
+
 async function newComment(req: Request, res: Response): Promise<void> {
   const body = req.body;
 
@@ -28,13 +33,27 @@ async function newComment(req: Request, res: Response): Promise<void> {
 }
 
 async function getComments(req: Request, res: Response): Promise<void> {
+
+  const query = req.query;
+  const limit = query && query.limit ? Number(query.limit) : undefined;
+  const queryObj: GetCommentsQuery = {};
+
+  if (query.findByCommentedUser) {
+    queryObj.commentedUser = query.findByCommentedUser;
+  }
+
+  if (query.findByCommentator) {
+    queryObj.commentator = query.findByCommentator;
+  }
+
   const params = {
-    query: {},
+    query: queryObj,
     projection: {
       __v: false,
       commentedUser: false
     },
-    sort: { dateCreated: -1 }
+    sort: { dateCreated: -1 },
+    limit
   };
 
   try {
