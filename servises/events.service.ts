@@ -3,7 +3,7 @@
 import * as mongoose from 'mongoose';
 import { Query } from 'mongoose';
 
-import { Event, EventResponse } from '../models/events.model';
+import { Event, EventResponse, LinkWithEmbedCode } from '../models/events.model';
 import { UpdateModel } from './update.interface';
 
 const eventsModel = mongoose.model('Events');
@@ -13,6 +13,11 @@ export interface GetEvetInterface {
   projection?: {[key: string]: any};
   limit?: number;
   sort?: any;
+  select?:  {[key: string]: any};
+}
+
+export interface AudiosFromDB {
+  audios: LinkWithEmbedCode[];
 }
 
 export function updateEvent(params: UpdateModel): Query<any> {
@@ -20,13 +25,23 @@ export function updateEvent(params: UpdateModel): Query<any> {
     .update(params.conditions, params.doc);
 }
 
-export function getEvent(params: GetEvetInterface): Promise<Event[]> {
+export function getEvent(params: GetEvetInterface): Promise<any[]> {
   const projection = params.projection ? params.projection : {};
 
   return eventsModel
     .find(params.query, projection)
     .sort(params.sort)
     .limit(params.limit)
+    .lean(true)
+    .exec();
+}
+
+export function getEventsAudio(params: GetEvetInterface): Promise<AudiosFromDB[]> {
+  return eventsModel
+    .find(params.query)
+    .sort(params.sort)
+    .limit(params.limit)
+    .select(params.select)
     .lean(true)
     .exec();
 }
