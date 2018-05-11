@@ -5,7 +5,7 @@ import * as mongoose from 'mongoose';
 import { ObjectID } from 'bson';
 
 import { updateUser } from '../servises/users.service';
-import { getEvent, transformEventToResponceObj, updateEvent } from '../servises/events.service';
+import { getEvent, getEventsAudio, transformEventToResponceObj, updateEvent } from '../servises/events.service';
 import { UpdateModel } from '../servises/update.interface';
 import { HttpStatus } from '../enums/http-status';
 
@@ -28,6 +28,7 @@ module.exports = (app: Express): void => {
   app.get('/get-events-amount', getEventsAmountData);
   app.get('/get-events-list-by-query', getEventsDataByQuery);
   app.get('/get-my-events', getEventsDataByQuery);
+  app.get('/get-users-audios', getUsersAudio);
   app.get('/get-free-ticket', getFreeTicket);
   app.post('/save-event', saveNewEvent);
 };
@@ -110,11 +111,11 @@ async function getEventsDataByQuery(req: Request, res: Response): Promise<void> 
   }
 }
 
-async function saveNewEvent(req: Request, res: Response): Promise<void | undefined> {
+async function saveNewEvent(req: Request, res: Response): Promise<void> {
   if (!req.body) {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Failed, eventId or userId is empty'});
 
-    return undefined;
+    return;
   }
 
   try {
@@ -144,13 +145,13 @@ async function saveNewEvent(req: Request, res: Response): Promise<void | undefin
   }
 }
 
-async function getFreeTicket(req: Request, res: Response): Promise<void | undefined> {
+async function getFreeTicket(req: Request, res: Response): Promise<void> {
   const query = req.query;
 
   if (!query.eventId && !query.userId) {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Failed, eventId or userId is empty'});
 
-    return undefined;
+    return;
   }
 
   try {
@@ -166,7 +167,7 @@ async function getFreeTicket(req: Request, res: Response): Promise<void | undefi
     if (isBuyed.length) {
       res.json({message: 'You have already bought the ticket', isAlreadyExist: true});
 
-      return undefined;
+      return;
     }
 
     const eventParams: UpdateModel = {
@@ -186,5 +187,36 @@ async function getFreeTicket(req: Request, res: Response): Promise<void | undefi
     res.json({message: 'You have succsefully purchased the ticket', isAlreadyExist: false});
   } catch (err) {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: err});
+  }
+}
+
+async function getUsersAudio(req: Request, res: Response): Promise<void> {
+  const query = req.query;
+
+  if (!query.userId) {
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({message: 'Unidentified user'});
+
+    return;
+  }
+
+  const searchParams = {
+    query: {creator: query.userId, audios: {$exists: true, $ne: []}},
+    select: {
+      audios: true
+    }
+  };
+
+  try {
+    const audios = await getEventsAudio(searchParams);
+
+    const responseAudios = audios.reduce((a, b) => {
+      a.push(...b.audios);
+
+      return a;
+    }, []);
+
+    res.json(responseAudios);
+  } catch (err) {
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
   }
 }
