@@ -1,19 +1,23 @@
-/* tslint:disable:no-any */
+import { Request, Express, Response } from 'express';
+import { model } from 'mongoose';
 
-import { Request, Express } from 'express';
-import * as mongoose from 'mongoose';
-const faqs = mongoose.model('Faqs');
+import { HttpStatus } from '../enums/http-status';
+
+const faqs = model('Faqs');
 
 module.exports = (app: Express): void => {
   app.get('/getFAQs', getFAQsData);
 };
 
-function getFAQsData(req: Request, res: any): Promise<any> {
-  return faqs
-    .find({})
-    .lean(true)
-    .exec((err: Error, data: any[]): Function => {
-      return res.json({success: !err, data, error: err});
-      }
-    );
+async function getFAQsData(req: Request, res: Response): Promise<void> {
+  try {
+    const faqsList = await faqs
+      .find({})
+      .lean(true)
+      .exec();
+
+    res.json(faqsList);
+  } catch (error) {
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
+  }
 }
